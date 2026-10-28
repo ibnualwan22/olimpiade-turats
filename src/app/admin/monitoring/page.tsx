@@ -134,10 +134,10 @@ export default function AdminMonitoringPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">
+          <h1 className="text-2xl font-extrabold text-zinc-900">
             Live Monitoring &amp; Papan Peringkat
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-zinc-500 mt-0.5">
             Pantau progres pengerjaan peserta secara langsung, tambah waktu
             ekstra, dan lihat hasil nilai + kecepatan.
           </p>
@@ -147,7 +147,7 @@ export default function AdminMonitoringPage() {
           <select
             value={selectedSessionId}
             onChange={(e) => setSelectedSessionId(e.target.value)}
-            className="px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm font-semibold"
+            className="px-3.5 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm font-semibold"
           >
             {sessions.map((s) => (
               <option key={s.id} value={s.id}>
@@ -158,7 +158,7 @@ export default function AdminMonitoringPage() {
 
           <button
             onClick={() => loadMonitoring(selectedSessionId)}
-            className="px-3.5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             <span>Segarkan</span>
@@ -167,12 +167,12 @@ export default function AdminMonitoringPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-200 pb-3">
+      <div className="flex gap-2 border-b border-zinc-200 pb-3">
         <button
           onClick={() => setActiveTab("MONITORING")}
           className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer ${activeTab === "MONITORING"
-            ? "bg-emerald-800 text-white"
-            : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+            ? "bg-zinc-800 text-white"
+            : "bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50"
             }`}
         >
           <Activity className="w-4 h-4" />
@@ -182,8 +182,8 @@ export default function AdminMonitoringPage() {
         <button
           onClick={() => setActiveTab("LEADERBOARD")}
           className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer ${activeTab === "LEADERBOARD"
-            ? "bg-amber-500 text-slate-950"
-            : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+            ? "bg-amber-500 text-zinc-950"
+            : "bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50"
             }`}
         >
           <Trophy className="w-4 h-4" />
@@ -192,16 +192,17 @@ export default function AdminMonitoringPage() {
       </div>
 
       {activeTab === "MONITORING" ? (
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+        <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-xs">
           {attempts.length === 0 ? (
-            <div className="p-12 text-center text-sm text-slate-500">
+            <div className="p-12 text-center text-sm text-zinc-500">
               Belum ada peserta yang memasukkan token pada sesi ini.
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            <div className="overflow-x-auto hidden md:block">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  <tr className="bg-zinc-50 border-b border-zinc-200 text-xs font-bold uppercase tracking-wider text-zinc-500">
                     <th className="p-4">Peserta &amp; Instansi</th>
                     <th className="p-4">Status Ujian</th>
                     <th className="p-4">Progres Soal</th>
@@ -210,18 +211,18 @@ export default function AdminMonitoringPage() {
                     <th className="p-4 text-right">Aksi Kontrol Panitia</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-sm">
+                <tbody className="divide-y divide-zinc-100 text-sm">
                   {attempts.map((a) => {
                     const totalQ = a.session._count.questions;
                     const answered = a._count.answers;
 
                     return (
-                      <tr key={a.id} className="hover:bg-slate-50/80">
+                      <tr key={a.id} className="hover:bg-zinc-50/80">
                         <td className="p-4">
-                          <div className="font-bold text-slate-900">
+                          <div className="font-bold text-zinc-900">
                             {a.user.name}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-zinc-500">
                             {a.user.username}{" "}
                             {a.user.institution
                               ? `• ${a.user.institution}`
@@ -237,12 +238,12 @@ export default function AdminMonitoringPage() {
                                 Mengerjakan
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-bold">
                                 Di Halaman Tata Tertib
                               </span>
                             )
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-zinc-800 text-xs font-bold">
                               <CheckCircle2 className="w-3.5 h-3.5" /> Selesai (
                               {a.status})
                             </span>
@@ -250,10 +251,10 @@ export default function AdminMonitoringPage() {
                         </td>
 
                         <td className="p-4">
-                          <div className="font-bold text-slate-800 text-xs">
+                          <div className="font-bold text-zinc-800 text-xs">
                             {answered} / {totalQ} Soal
                           </div>
-                          <div className="w-28 h-2 bg-slate-100 rounded-full overflow-hidden mt-1">
+                          <div className="w-28 h-2 bg-zinc-100 rounded-full overflow-hidden mt-1">
                             <div
                               className="h-full bg-emerald-600 rounded-full"
                               style={{
@@ -266,7 +267,7 @@ export default function AdminMonitoringPage() {
                           </div>
                         </td>
 
-                        <td className="p-4 text-xs text-slate-600">
+                        <td className="p-4 text-xs text-zinc-600">
                           {a.status === "IN_PROGRESS" ? (
                             <div>
                               <div>
@@ -278,13 +279,13 @@ export default function AdminMonitoringPage() {
                                   : "Belum klik mulai"}
                               </div>
                               {a.extraMinutes > 0 && (
-                                <span className="text-emerald-700 font-bold">
+                                <span className="text-amber-700 font-bold">
                                   +{a.extraMinutes}m ekstra
                                 </span>
                               )}
                             </div>
                           ) : (
-                            <span className="font-semibold text-slate-900">
+                            <span className="font-semibold text-zinc-900">
                               Selesai dalam {formatTimeSpent(a.timeSpentSeconds)}
                             </span>
                           )}
@@ -293,15 +294,15 @@ export default function AdminMonitoringPage() {
                         <td className="p-4">
                           {a.status !== "IN_PROGRESS" ? (
                             <div>
-                              <div className="font-black text-emerald-800 text-base">
+                              <div className="font-black text-zinc-800 text-base">
                                 {a.finalScore} Poin
                               </div>
-                              <div className="text-[11px] text-slate-500">
+                              <div className="text-xs text-zinc-500">
                                 Soal: {a.rawScore} | Speed: +{a.speedBonus}
                               </div>
                             </div>
                           ) : (
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-zinc-400">
                               Menunggu selesai
                             </span>
                           )}
@@ -314,7 +315,7 @@ export default function AdminMonitoringPage() {
                                 <button
                                   onClick={() => handleAction(a.id, "ADD_TIME")}
                                   title="Tambah Waktu +5 Menit"
-                                  className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-1 cursor-pointer"
+                                  className="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold flex items-center gap-1 cursor-pointer"
                                 >
                                   <PlusCircle className="w-3.5 h-3.5" /> +5m
                                 </button>
@@ -344,20 +345,107 @@ export default function AdminMonitoringPage() {
                 </tbody>
               </table>
             </div>
+            <div className="md:hidden divide-y divide-zinc-100">
+              {attempts.map((a) => {
+                const totalQ = a.session._count.questions;
+                const answered = a._count.answers;
+                return (
+                  <div key={a.id} className="p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-bold text-zinc-900 truncate">
+                          {a.user.name}
+                        </div>
+                        <div className="text-xs text-zinc-500 truncate">
+                          {a.user.username}
+                          {a.user.institution
+                            ? ` • ${a.user.institution}`
+                            : ""}
+                        </div>
+                      </div>
+                      {a.status === "IN_PROGRESS" ? (
+                        a.startedAt ? (
+                          <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold">
+                            <Clock className="w-3.5 h-3.5" /> Mengerjakan
+                          </span>
+                        ) : (
+                          <span className="shrink-0 px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-bold">
+                            Tata Tertib
+                          </span>
+                        )
+                      ) : (
+                        <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Selesai
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-zinc-600">
+                      <span className="font-bold text-zinc-800">
+                        {answered} / {totalQ} soal
+                      </span>
+                      {a.status !== "IN_PROGRESS" ? (
+                        <span className="ml-2">
+                          {a.finalScore} poin (Soal {a.rawScore} | Speed +
+                          {a.speedBonus})
+                        </span>
+                      ) : a.expiresAt ? (
+                        <span className="ml-2">
+                          Batas{" "}
+                          {new Date(a.expiresAt).toLocaleTimeString("id-ID")}
+                        </span>
+                      ) : (
+                        <span className="ml-2">Belum klik mulai</span>
+                      )}
+                      {a.status === "IN_PROGRESS" && a.extraMinutes > 0 && (
+                        <span className="ml-2 text-amber-700 font-bold">
+                          +{a.extraMinutes}m ekstra
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      {a.status === "IN_PROGRESS" && a.startedAt && (
+                        <>
+                          <button
+                            onClick={() => handleAction(a.id, "ADD_TIME")}
+                            className="flex-1 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <PlusCircle className="w-3.5 h-3.5" /> +5m
+                          </button>
+                          <button
+                            onClick={() => handleAction(a.id, "FORCE_SUBMIT")}
+                            className="flex-1 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold cursor-pointer"
+                          >
+                            Submit
+                          </button>
+                        </>
+                      )}
+                      <button
+                        onClick={() => handleAction(a.id, "RESET")}
+                        className="flex-1 px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" /> Reset
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
           )}
         </div>
       ) : (
         /* TAB LEADERBOARD */
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+        <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-xs">
           {finishedRankings.length === 0 ? (
-            <div className="p-12 text-center text-sm text-slate-500">
+            <div className="p-12 text-center text-sm text-zinc-500">
               Belum ada peserta yang menyelesaikan ujian pada sesi ini.
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            <div className="overflow-x-auto hidden md:block">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-emerald-950 text-white text-[11px] font-bold uppercase tracking-wider">
+                  <tr className="bg-zinc-900 text-white text-xs font-bold uppercase tracking-wider">
                     <th className="p-4">Peringkat</th>
                     <th className="p-4">Nama Peserta &amp; Utusan</th>
                     <th className="p-4">Skor Jawaban</th>
@@ -366,32 +454,32 @@ export default function AdminMonitoringPage() {
                     <th className="p-4 text-right">Total Nilai Akhir</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-sm">
+                <tbody className="divide-y divide-zinc-100 text-sm">
                   {finishedRankings.map((r, idx) => (
                     <tr key={r.id} className="hover:bg-amber-50/30">
                       <td className="p-4">
                         <span
                           className={`w-8 h-8 rounded-xl font-black text-xs inline-flex items-center justify-center ${idx === 0
-                            ? "bg-amber-400 text-slate-950"
+                            ? "bg-amber-400 text-zinc-950"
                             : idx === 1
-                              ? "bg-slate-300 text-slate-900"
+                              ? "bg-zinc-300 text-zinc-900"
                               : idx === 2
                                 ? "bg-amber-700 text-white"
-                                : "bg-slate-100 text-slate-600"
+                                : "bg-zinc-100 text-zinc-600"
                             }`}
                         >
                           #{idx + 1}
                         </span>
                       </td>
                       <td className="p-4">
-                        <div className="font-bold text-slate-900">
+                        <div className="font-bold text-zinc-900">
                           {r.user.name}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-zinc-500">
                           {r.user.institution || r.user.username}
                         </div>
                       </td>
-                      <td className="p-4 font-semibold text-slate-800">
+                      <td className="p-4 font-semibold text-zinc-800">
                         {r.rawScore} Poin
                         {r.penaltyScore > 0 && (
                           <span className="text-xs text-red-600 ml-1">
@@ -405,11 +493,11 @@ export default function AdminMonitoringPage() {
                           {r.speedBonus}
                         </span>
                       </td>
-                      <td className="p-4 font-mono text-xs text-slate-700">
+                      <td className="p-4 font-mono text-xs text-zinc-700">
                         {formatTimeSpent(r.timeSpentSeconds)}
                       </td>
                       <td className="p-4 text-right">
-                        <span className="text-lg font-black text-emerald-800">
+                        <span className="text-lg font-black text-zinc-800">
                           {r.finalScore}
                         </span>
                       </td>
@@ -418,6 +506,47 @@ export default function AdminMonitoringPage() {
                 </tbody>
               </table>
             </div>
+            <div className="md:hidden divide-y divide-zinc-100">
+              {finishedRankings.map((r, idx) => (
+                <div key={r.id} className="p-4 flex items-start gap-3">
+                  <span
+                    className={`w-8 h-8 rounded-lg font-black text-xs inline-flex items-center justify-center shrink-0 ${idx === 0
+                      ? "bg-amber-400 text-zinc-950"
+                      : idx === 1
+                        ? "bg-zinc-300 text-zinc-900"
+                        : idx === 2
+                          ? "bg-amber-700 text-white"
+                          : "bg-zinc-100 text-zinc-600"
+                      }`}
+                  >
+                    #{idx + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-zinc-900 truncate">
+                      {r.user.name}
+                    </div>
+                    <div className="text-xs text-zinc-500 truncate">
+                      {r.user.institution || r.user.username}
+                    </div>
+                    <div className="text-xs text-zinc-600 mt-1">
+                      Skor {r.rawScore}
+                      {r.penaltyScore > 0 && (
+                        <span className="text-red-600">
+                          {" "}
+                          (-{r.penaltyScore})
+                        </span>
+                      )}{" "}
+                      • Speed +{r.speedBonus} •{" "}
+                      {formatTimeSpent(r.timeSpentSeconds)}
+                    </div>
+                  </div>
+                  <div className="text-lg font-black text-zinc-900 shrink-0">
+                    {r.finalScore}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
           )}
         </div>
       )}

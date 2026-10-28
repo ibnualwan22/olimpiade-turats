@@ -11,7 +11,6 @@ import {
   PlayCircle,
   Trophy,
   Zap,
-  Sparkles,
 } from "lucide-react";
 
 interface AttemptItem {
@@ -116,8 +115,8 @@ export default function ParticipantDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-slate-500 text-sm font-medium animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+        <div className="text-zinc-500 text-sm font-medium animate-pulse">
           Memuat portal peserta...
         </div>
       </div>
@@ -125,9 +124,9 @@ export default function ParticipantDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-zinc-50 flex flex-col">
       {/* Top Navbar */}
-      <header className="bg-emerald-950 text-white border-b border-emerald-800">
+      <header className="bg-zinc-900 text-white border-b border-zinc-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
@@ -137,7 +136,7 @@ export default function ParticipantDashboardPage() {
               <div className="font-bold text-sm sm:text-base tracking-tight">
                 Olimpiade Turats CBT
               </div>
-              <div className="text-[11px] text-emerald-300">
+              <div className="text-xs text-amber-300">
                 Portal Peserta Perlombaan
               </div>
             </div>
@@ -149,14 +148,14 @@ export default function ParticipantDashboardPage() {
                 <div className="text-sm font-semibold text-white">
                   {user.name}
                 </div>
-                <div className="text-xs text-emerald-300">
+                <div className="text-xs text-amber-300">
                   {user.username} {user.institution ? `• ${user.institution}` : ""}
                 </div>
               </div>
             )}
             <button
               onClick={handleLogout}
-              className="px-3 py-1.5 rounded-lg bg-emerald-900 hover:bg-red-900/70 border border-emerald-700 text-xs font-medium flex items-center gap-1.5 transition cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-red-900/70 border border-zinc-700 text-xs font-medium flex items-center gap-1.5 transition cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Keluar</span>
@@ -167,8 +166,8 @@ export default function ParticipantDashboardPage() {
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
         {/* Card Input Token Ujian */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-950 p-6 sm:p-8 text-white">
+        <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+          <div className="bg-zinc-900 p-6 sm:p-8 text-white">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-300 bg-amber-400/10 border border-amber-400/30 px-3 py-1 rounded-full mb-3">
@@ -177,7 +176,7 @@ export default function ParticipantDashboardPage() {
                 <h1 className="text-2xl font-bold">
                   Masukkan Token Sesi Perlombaan
                 </h1>
-                <p className="text-sm text-emerald-100/80 mt-1">
+                <p className="text-sm text-zinc-200/80 mt-1">
                   Masukkan kode token yang diberikan oleh panitia untuk membaca
                   Tata Tertib dan memulai ujian.
                 </p>
@@ -208,12 +207,12 @@ export default function ParticipantDashboardPage() {
                 value={token}
                 onChange={(e) => setToken(e.target.value.toUpperCase())}
                 placeholder="KETIK TOKEN UJIAN (Contoh: TURATS2026)"
-                className="flex-1 px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10 outline-none font-mono text-lg font-bold tracking-widest uppercase text-slate-900 transition"
+                className="flex-1 px-4 py-3.5 rounded-xl border-2 border-zinc-200 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 outline-none font-mono text-lg font-bold tracking-widest uppercase text-zinc-900 transition"
               />
               <button
                 type="submit"
                 disabled={submittingToken}
-                className="px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-700/20 transition cursor-pointer"
+                className="px-6 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-60 text-zinc-950 font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-400/20 transition cursor-pointer"
               >
                 <KeyRound className="w-4 h-4" />
                 <span>
@@ -224,14 +223,14 @@ export default function ParticipantDashboardPage() {
               </button>
             </form>
 
-            <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
+              <KeyRound className="w-3.5 h-3.5 text-amber-500" />
               <span>
                 Tips Demo: Klik untuk mengisi token contoh{" "}
                 <button
                   type="button"
                   onClick={() => setToken("TURATS2026")}
-                  className="font-mono font-bold text-emerald-700 underline cursor-pointer"
+                  className="font-mono font-bold text-amber-700 underline cursor-pointer"
                 >
                   TURATS2026
                 </button>
@@ -242,12 +241,12 @@ export default function ParticipantDashboardPage() {
 
         {/* Riwayat Sesi Ujian yang Diikuti */}
         <div>
-          <h2 className="text-lg font-bold text-slate-900 mb-4">
+          <h2 className="text-lg font-bold text-zinc-900 mb-4">
             Riwayat &amp; Status Sesi Ujian Anda
           </h2>
 
           {attempts.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500 text-sm">
+            <div className="bg-white rounded-xl border border-zinc-200 p-8 text-center text-zinc-500 text-sm">
               Anda belum memasuki sesi ujian mana pun. Silakan masukkan Token
               Sesi di atas.
             </div>
@@ -256,7 +255,7 @@ export default function ParticipantDashboardPage() {
               {attempts.map((att) => (
                 <div
                   key={att.id}
-                  className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
+                  className="bg-white rounded-xl border border-zinc-200 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
                 >
                   <div className="space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
@@ -264,7 +263,7 @@ export default function ParticipantDashboardPage() {
                         className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
                           att.status === "IN_PROGRESS"
                             ? "bg-amber-100 text-amber-800"
-                            : "bg-emerald-100 text-emerald-800"
+                            : "bg-emerald-100 text-zinc-800"
                         }`}
                       >
                         {att.status === "IN_PROGRESS"
@@ -273,20 +272,20 @@ export default function ParticipantDashboardPage() {
                             : "Menunggu Klik Mulai"
                           : "Selesai Dikerjakan"}
                       </span>
-                      <span className="text-xs text-slate-500 flex items-center gap-1">
+                      <span className="text-xs text-zinc-500 flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5" />
                         Durasi {att.session.durationMinutes} Menit (
                         {att.session._count.questions} Soal)
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-base font-bold text-zinc-900">
                       {att.session.title}
                     </h3>
 
                     {att.status !== "IN_PROGRESS" && (
-                      <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-slate-600">
-                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                      <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-zinc-600">
+                        <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
                           <Trophy className="w-3.5 h-3.5 text-amber-500" />
                           Skor Akhir: {att.finalScore}
                         </span>
@@ -312,7 +311,7 @@ export default function ParticipantDashboardPage() {
                               : `/exam/${att.sessionId}/rules`
                           )
                         }
-                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                       >
                         <PlayCircle className="w-4 h-4" />
                         <span>
@@ -326,7 +325,7 @@ export default function ParticipantDashboardPage() {
                         onClick={() =>
                           router.push(`/exam/${att.sessionId}/play`)
                         }
-                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                       >
                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                         <span>Lihat Ringkasan Hasil</span>

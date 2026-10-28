@@ -91,8 +91,8 @@ export default function ExamRulesPage({
 
   if (loading || !sessionData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-sm text-slate-500 animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+        <div className="text-sm text-zinc-500 animate-pulse">
           Memuat halaman Tata Tertib...
         </div>
       </div>
@@ -100,13 +100,13 @@ export default function ExamRulesPage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 py-8 px-4 sm:px-6 flex items-center justify-center">
-      <div className="max-w-3xl w-full bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+    <div className="min-h-screen bg-zinc-100 py-8 px-4 sm:px-6 flex items-center justify-center">
+      <div className="max-w-3xl w-full bg-white rounded-xl shadow-lg border border-zinc-200 overflow-hidden">
         {/* Header */}
-        <div className="bg-emerald-950 text-white p-6 sm:p-8 border-b border-emerald-800">
+        <div className="bg-zinc-900 text-white p-6 sm:p-8 border-b border-zinc-800">
           <button
             onClick={() => router.push("/exam")}
-            className="inline-flex items-center gap-1.5 text-xs text-emerald-300 hover:text-white mb-4 cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs text-amber-300 hover:text-white mb-4 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Portal Peserta
           </button>
@@ -114,45 +114,45 @@ export default function ExamRulesPage({
             {sessionData.title}
           </h1>
           {sessionData.description && (
-            <p className="text-sm text-emerald-100/80 mt-2">
+            <p className="text-sm text-zinc-200/80 mt-2">
               {sessionData.description}
             </p>
           )}
         </div>
 
         {/* Info Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-6 bg-slate-50 border-b border-slate-200">
-          <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-emerald-100 text-emerald-800">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-6 bg-zinc-50 border-b border-zinc-200">
+          <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-emerald-100 text-zinc-800">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-xs text-slate-500">Durasi Pengerjaan</div>
-              <div className="text-sm font-bold text-slate-900">
+              <div className="text-xs text-zinc-500">Durasi Pengerjaan</div>
+              <div className="text-sm font-bold text-zinc-900">
                 {sessionData.durationMinutes} Menit
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-blue-100 text-blue-800">
+          <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-zinc-100 text-zinc-700">
               <FileQuestion className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-xs text-slate-500">Jumlah Soal</div>
-              <div className="text-sm font-bold text-slate-900">
+              <div className="text-xs text-zinc-500">Jumlah Soal</div>
+              <div className="text-sm font-bold text-zinc-900">
                 {sessionData.totalQuestions} Pilihan Ganda
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-3">
+          <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-amber-100 text-amber-800">
               <Zap className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-xs text-slate-500">Skor Kecepatan</div>
-              <div className="text-sm font-bold text-slate-900">
+              <div className="text-xs text-zinc-500">Skor Kecepatan</div>
+              <div className="text-sm font-bold text-zinc-900">
                 {sessionData.speedScoringMode === "BONUS_POINTS"
                   ? `Bonus s/d +${sessionData.maxSpeedBonus} Poin`
                   : "Penentu Peringkat Seri"}
@@ -169,7 +169,7 @@ export default function ExamRulesPage({
               <span>Tata Tertib &amp; Ketentuan Perlombaan</span>
             </div>
 
-            <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-5 text-sm text-slate-800 whitespace-pre-line leading-relaxed">
+            <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-5 text-sm text-zinc-800 whitespace-pre-line leading-relaxed">
               {sessionData.rulesContent}
             </div>
           </div>
@@ -181,15 +181,15 @@ export default function ExamRulesPage({
           )}
 
           {/* Checkbox Persetujuan */}
-          <label className="flex items-start gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer select-none">
+          <label className="flex items-start gap-3 p-4 rounded-xl border border-zinc-200 bg-zinc-50 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-1 w-4 h-4 accent-emerald-700 rounded cursor-pointer"
+              className="mt-1 w-4 h-4 accent-zinc-700 rounded cursor-pointer"
             />
-            <div className="text-xs sm:text-sm text-slate-700">
-              <span className="font-bold text-slate-900 block mb-0.5">
+            <div className="text-xs sm:text-sm text-zinc-700">
+              <span className="font-bold text-zinc-900 block mb-0.5">
                 Saya telah membaca dan menyetujui seluruh Tata Tertib di atas.
               </span>
               Saya memahami bahwa begitu tombol{" "}
@@ -204,7 +204,7 @@ export default function ExamRulesPage({
               type="button"
               disabled={!agreed || starting}
               onClick={handleStartExam}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-700/25 transition cursor-pointer"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-zinc-700/25 transition cursor-pointer"
             >
               <Play className="w-4 h-4 fill-current" />
               <span>

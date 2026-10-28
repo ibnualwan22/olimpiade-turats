@@ -113,10 +113,10 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">
+          <h1 className="text-2xl font-extrabold text-zinc-900">
             Manajemen User &amp; Hak Akses
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-zinc-500 mt-0.5">
             Kelola seluruh akun Administrator/Panitia dan Peserta dalam satu
             halaman.
           </p>
@@ -124,23 +124,24 @@ export default function AdminUsersPage() {
 
         <button
           onClick={openCreateModal}
-          className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
+          className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah User / Admin</span>
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+      <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-xs">
         {loading ? (
-          <div className="p-12 text-center text-sm text-slate-500">
+          <div className="p-12 text-center text-sm text-zinc-500">
             Memuat daftar user...
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          <div className="overflow-x-auto hidden md:block">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <tr className="bg-zinc-50 border-b border-zinc-200 text-xs font-bold uppercase tracking-wider text-zinc-500">
                   <th className="p-4">Username</th>
                   <th className="p-4">Nama Lengkap</th>
                   <th className="p-4">Role / Peran</th>
@@ -149,13 +150,13 @@ export default function AdminUsersPage() {
                   <th className="p-4 text-right">Aksi CRUD</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
+              <tbody className="divide-y divide-zinc-100 text-sm">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-50/80">
-                    <td className="p-4 font-mono font-bold text-slate-900">
+                  <tr key={u.id} className="hover:bg-zinc-50/80">
+                    <td className="p-4 font-mono font-bold text-zinc-900">
                       {u.username}
                     </td>
-                    <td className="p-4 font-semibold text-slate-900">
+                    <td className="p-4 font-semibold text-zinc-900">
                       {u.name}
                     </td>
                     <td className="p-4">
@@ -164,19 +165,19 @@ export default function AdminUsersPage() {
                           <ShieldCheck className="w-3.5 h-3.5" /> ADMIN PANITIA
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">
+                        <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-xs font-bold">
                           PESERTA
                         </span>
                       )}
                     </td>
-                    <td className="p-4 text-slate-600">
+                    <td className="p-4 text-zinc-600">
                       {u.institution || "-"}
                     </td>
                     <td className="p-4">
                       <span
                         className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
                           u.isActive
-                            ? "bg-emerald-100 text-emerald-800"
+                            ? "bg-emerald-100 text-zinc-800"
                             : "bg-red-100 text-red-700"
                         }`}
                       >
@@ -187,7 +188,7 @@ export default function AdminUsersPage() {
                       <div className="inline-flex items-center gap-1.5">
                         <button
                           onClick={() => openEditModal(u)}
-                          className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
                         >
                           <Pencil className="w-3.5 h-3.5" /> Edit
                         </button>
@@ -204,19 +205,73 @@ export default function AdminUsersPage() {
               </tbody>
             </table>
           </div>
+          <div className="md:hidden divide-y divide-zinc-100">
+              {users.map((u) => (
+                <div key={u.id} className="p-4 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="font-semibold text-zinc-900 truncate">
+                        {u.name}
+                      </div>
+                      <div className="font-mono text-xs font-bold text-zinc-600">
+                        {u.username}
+                      </div>
+                    </div>
+                    {u.role === "ADMIN" ? (
+                      <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-bold">
+                        <ShieldCheck className="w-3.5 h-3.5" /> ADMIN
+                      </span>
+                    ) : (
+                      <span className="shrink-0 px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-xs font-bold">
+                        PESERTA
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-zinc-500 truncate">
+                      {u.institution || "-"}
+                    </span>
+                    <span
+                      className={`shrink-0 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                        u.isActive
+                          ? "bg-emerald-100 text-emerald-800"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {u.isActive ? "Aktif" : "Nonaktif"}
+                    </span>
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      onClick={() => openEditModal(u)}
+                      className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 text-zinc-700 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(u.id)}
+                      className="flex-1 px-3 py-2 rounded-lg border border-red-200 text-red-600 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Hapus
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+        </>
         )}
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h2 className="text-lg font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+              <h2 className="text-lg font-bold text-zinc-900">
                 {editingId ? "Edit User" : "Tambah User Baru"}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-600 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -224,7 +279,7 @@ export default function AdminUsersPage() {
 
             <form onSubmit={handleSave} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Role / Peran Akun
                 </label>
                 <select
@@ -232,7 +287,7 @@ export default function AdminUsersPage() {
                   onChange={(e) =>
                     setRole(e.target.value as "ADMIN" | "PARTICIPANT")
                   }
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm bg-white"
+                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 text-sm bg-white"
                 >
                   <option value="ADMIN">ADMIN (Panitia / Pengelola)</option>
                   <option value="PARTICIPANT">PARTICIPANT (Peserta Ujian)</option>
@@ -240,7 +295,7 @@ export default function AdminUsersPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Username Login
                 </label>
                 <input
@@ -248,12 +303,12 @@ export default function AdminUsersPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-mono"
+                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 text-sm font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Nama Lengkap
                 </label>
                 <input
@@ -261,15 +316,15 @@ export default function AdminUsersPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm"
+                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Password{" "}
                   {editingId && (
-                    <span className="font-normal text-slate-400">
+                    <span className="font-normal text-zinc-400">
                       (Kosongkan jika tidak diubah)
                     </span>
                   )}
@@ -279,44 +334,44 @@ export default function AdminUsersPage() {
                   required={!editingId}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm"
+                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Instansi / Keterangan
                 </label>
                 <input
                   type="text"
                   value={institution}
                   onChange={(e) => setInstitution(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm"
+                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 text-sm"
                 />
               </div>
 
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-700 pt-1 cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-bold text-zinc-700 pt-1 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="w-4 h-4 accent-emerald-700"
+                  className="w-4 h-4 accent-zinc-700"
                 />
                 <span>Akun Aktif</span>
               </label>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-200">
+              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-200">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold cursor-pointer"
                 >
                   {saving ? "Menyimpan..." : "Simpan User"}
                 </button>

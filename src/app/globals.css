@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #fafafa;
+  --foreground: #18181b;
 }
 
 @theme inline {
@@ -21,4 +21,9 @@ body {
 .font-arabic {
   font-family: var(--font-amiri), "Traditional Arabic", "Amiri", serif;
   line-height: 2.1 !important;
+}
+
+::selection {
+  background: #fbbf24;
+  color: #09090b;
 }

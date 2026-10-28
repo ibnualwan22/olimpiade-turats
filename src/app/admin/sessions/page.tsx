@@ -192,10 +192,10 @@ export default function AdminSessionsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">
+          <h1 className="text-2xl font-extrabold text-zinc-900">
             Manajemen Sesi Ujian, Token &amp; Regulasi
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-zinc-500 mt-0.5">
             Atur sesi perlombaan, kode token masuk, teks tata tertib, durasi,
             dan rumus penilaian kecepatan.
           </p>
@@ -203,7 +203,7 @@ export default function AdminSessionsPage() {
 
         <button
           onClick={openCreateModal}
-          className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
+          className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Buat Sesi Ujian Baru</span>
@@ -211,11 +211,11 @@ export default function AdminSessionsPage() {
       </div>
 
       {loading ? (
-        <div className="p-12 text-center text-sm text-slate-500">
+        <div className="p-12 text-center text-sm text-zinc-500">
           Memuat daftar sesi...
         </div>
       ) : sessions.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-sm text-slate-500">
+        <div className="bg-white rounded-xl border border-zinc-200 p-12 text-center text-sm text-zinc-500">
           Belum ada sesi ujian.
         </div>
       ) : (
@@ -223,7 +223,7 @@ export default function AdminSessionsPage() {
           {sessions.map((s) => (
             <div
               key={s.id}
-              className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4"
+              className="bg-white rounded-xl border border-zinc-200 p-6 shadow-xs space-y-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-1">
@@ -231,8 +231,8 @@ export default function AdminSessionsPage() {
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
                         s.isActive
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-slate-200 text-slate-700"
+                          ? "bg-emerald-100 text-zinc-800"
+                          : "bg-zinc-200 text-zinc-700"
                       }`}
                     >
                       {s.isActive ? "Sesi Aktif / Dibuka" : "Ditutup"}
@@ -242,11 +242,11 @@ export default function AdminSessionsPage() {
                       TOKEN: {s.accessToken}
                     </span>
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900 pt-1">
+                  <h2 className="text-lg font-bold text-zinc-900 pt-1">
                     {s.title}
                   </h2>
                   {s.description && (
-                    <p className="text-xs sm:text-sm text-slate-500">
+                    <p className="text-xs sm:text-sm text-zinc-500">
                       {s.description}
                     </p>
                   )}
@@ -255,7 +255,7 @@ export default function AdminSessionsPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => openEditModal(s)}
-                    className="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                    className="px-3.5 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                   >
                     <Pencil className="w-3.5 h-3.5" /> Edit Sesi &amp; Soal
                   </button>
@@ -269,26 +269,26 @@ export default function AdminSessionsPage() {
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="text-[11px] text-slate-500 flex items-center gap-1">
+                <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200">
+                  <div className="text-xs text-zinc-500 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" /> Durasi Timer
                   </div>
-                  <div className="text-sm font-bold text-slate-900 mt-0.5">
+                  <div className="text-sm font-bold text-zinc-900 mt-0.5">
                     {s.durationMinutes} Menit
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="text-[11px] text-slate-500 flex items-center gap-1">
+                <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200">
+                  <div className="text-xs text-zinc-500 flex items-center gap-1">
                     <CheckSquare className="w-3.5 h-3.5" /> Soal Terhubung
                   </div>
-                  <div className="text-sm font-bold text-slate-900 mt-0.5">
+                  <div className="text-sm font-bold text-zinc-900 mt-0.5">
                     {s._count.questions} Soal ({s.shuffleQuestions ? "Diacak" : "Urut"})
                   </div>
                 </div>
 
                 <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200">
-                  <div className="text-[11px] text-amber-800 flex items-center gap-1">
+                  <div className="text-xs text-amber-800 flex items-center gap-1">
                     <Zap className="w-3.5 h-3.5" /> Mode Kecepatan
                   </div>
                   <div className="text-sm font-bold text-amber-950 mt-0.5">
@@ -298,11 +298,11 @@ export default function AdminSessionsPage() {
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="text-[11px] text-slate-500">
+                <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200">
+                  <div className="text-xs text-zinc-500">
                     Peserta Mengikuti
                   </div>
-                  <div className="text-sm font-bold text-slate-900 mt-0.5">
+                  <div className="text-sm font-bold text-zinc-900 mt-0.5">
                     {s._count.attempts} Peserta
                   </div>
                 </div>
@@ -314,15 +314,15 @@ export default function AdminSessionsPage() {
 
       {/* Modal Form Sesi */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
-              <h2 className="text-lg font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-3xl w-full p-6 shadow-2xl border border-zinc-200 my-8 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-200 mb-5">
+              <h2 className="text-lg font-bold text-zinc-900">
                 {editingId ? "Edit Sesi Ujian & Regulasi" : "Buat Sesi Ujian Baru"}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -331,7 +331,7 @@ export default function AdminSessionsPage() {
             <form onSubmit={handleSaveSession} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Nama Sesi Perlombaan
                   </label>
                   <input
@@ -340,12 +340,12 @@ export default function AdminSessionsPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Contoh: Babak Penyisihan Olimpiade Turats 2026"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm"
+                    className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Token Masuk Sesi
                   </label>
                   <div className="flex gap-1.5">
@@ -356,13 +356,13 @@ export default function AdminSessionsPage() {
                       onChange={(e) =>
                         setAccessToken(e.target.value.toUpperCase())
                       }
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-sm uppercase"
+                      className="w-full px-3 py-2 rounded-xl border border-zinc-300 font-mono font-bold text-sm uppercase"
                     />
                     <button
                       type="button"
                       onClick={generateRandomToken}
                       title="Acak Token"
-                      className="p-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-600 cursor-pointer"
+                      className="p-2 rounded-xl border border-zinc-300 hover:bg-zinc-100 text-zinc-600 cursor-pointer"
                     >
                       <RefreshCw className="w-4 h-4" />
                     </button>
@@ -371,7 +371,7 @@ export default function AdminSessionsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Deskripsi Sesi
                 </label>
                 <input
@@ -379,14 +379,14 @@ export default function AdminSessionsPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Keterangan singkat sesi ujian"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm"
+                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 text-sm"
                 />
               </div>
 
               {/* Pengaturan Waktu & Regulasi Skor */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-zinc-50 border border-zinc-200">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Durasi Waktu (Menit)
                   </label>
                   <input
@@ -395,12 +395,12 @@ export default function AdminSessionsPage() {
                     required
                     value={durationMinutes}
                     onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm"
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-300 bg-white text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Mode Penilaian Kecepatan
                   </label>
                   <select
@@ -410,7 +410,7 @@ export default function AdminSessionsPage() {
                         e.target.value as "BONUS_POINTS" | "TIE_BREAKER"
                       )
                     }
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm"
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-300 bg-white text-sm"
                   >
                     <option value="BONUS_POINTS">
                       Bonus Poin Kecepatan Proporsional
@@ -422,7 +422,7 @@ export default function AdminSessionsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Maksimal Bonus Kecepatan
                   </label>
                   <input
@@ -431,12 +431,12 @@ export default function AdminSessionsPage() {
                     step="1"
                     value={maxSpeedBonus}
                     onChange={(e) => setMaxSpeedBonus(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm"
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-300 bg-white text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Pengurangan Jawaban Salah (Minus)
                   </label>
                   <input
@@ -446,33 +446,33 @@ export default function AdminSessionsPage() {
                     value={wrongPenalty}
                     onChange={(e) => setWrongPenalty(Number(e.target.value))}
                     placeholder="0 = Tanpa Minus"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm"
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-300 bg-white text-sm"
                   />
                 </div>
 
-                <label className="flex items-center gap-2 text-xs font-bold text-slate-700 pt-5 cursor-pointer">
+                <label className="flex items-center gap-2 text-xs font-bold text-zinc-700 pt-5 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={shuffleQuestions}
                     onChange={(e) => setShuffleQuestions(e.target.checked)}
-                    className="w-4 h-4 accent-emerald-700"
+                    className="w-4 h-4 accent-zinc-700"
                   />
                   <span>Acak Urutan Soal per Peserta</span>
                 </label>
 
-                <label className="flex items-center gap-2 text-xs font-bold text-emerald-800 pt-5 cursor-pointer">
+                <label className="flex items-center gap-2 text-xs font-bold text-zinc-800 pt-5 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={isActive}
                     onChange={(e) => setIsActive(e.target.checked)}
-                    className="w-4 h-4 accent-emerald-700"
+                    className="w-4 h-4 accent-zinc-700"
                   />
                   <span>Buka / Aktifkan Sesi Ini</span>
                 </label>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-zinc-700 mb-1">
                   Teks Tata Tertib (Ditampilkan sebelum Peserta klik Mulai)
                 </label>
                 <textarea
@@ -480,14 +480,14 @@ export default function AdminSessionsPage() {
                   required
                   value={rulesContent}
                   onChange={(e) => setRulesContent(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-300 text-xs sm:text-sm"
+                  className="w-full p-3 rounded-xl border border-zinc-300 text-xs sm:text-sm"
                 />
               </div>
 
               {/* Pilih Soal untuk Sesi */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-bold text-slate-700">
+                  <label className="text-xs font-bold text-zinc-700">
                     Pilih Soal yang Dimasukkan ke Sesi Ini (
                     {selectedQuestionIds.length} dari {bankQuestions.length} soal
                     dipilih)
@@ -501,7 +501,7 @@ export default function AdminSessionsPage() {
                           : bankQuestions.map((q) => q.id)
                       )
                     }
-                    className="text-xs font-bold text-emerald-700 hover:underline cursor-pointer"
+                    className="text-xs font-bold text-amber-700 hover:underline cursor-pointer"
                   >
                     {selectedQuestionIds.length === bankQuestions.length
                       ? "Hapus Semua Pilihan"
@@ -509,23 +509,23 @@ export default function AdminSessionsPage() {
                   </button>
                 </div>
 
-                <div className="max-h-52 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100">
+                <div className="max-h-52 overflow-y-auto border border-zinc-200 rounded-xl divide-y divide-zinc-100">
                   {bankQuestions.map((q) => {
                     const checked = selectedQuestionIds.includes(q.id);
                     return (
                       <label
                         key={q.id}
-                        className="p-3 flex items-center gap-3 hover:bg-slate-50 cursor-pointer"
+                        className="p-3 flex items-center gap-3 hover:bg-zinc-50 cursor-pointer"
                       >
                         <input
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggleQuestionSelection(q.id)}
-                          className="w-4 h-4 accent-emerald-700 shrink-0"
+                          className="w-4 h-4 accent-zinc-700 shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                            <span className="font-semibold text-emerald-700">
+                          <div className="flex items-center gap-2 text-xs text-zinc-500">
+                            <span className="font-semibold text-amber-700">
                               {q.category?.name || "Umum"}
                             </span>
                             <span>•</span>
@@ -533,7 +533,7 @@ export default function AdminSessionsPage() {
                           </div>
                           <div
                             dir={q.direction === "RTL" ? "rtl" : "ltr"}
-                            className={`truncate text-slate-800 ${
+                            className={`truncate text-zinc-800 ${
                               q.direction === "RTL"
                                 ? "font-arabic text-lg"
                                 : "text-xs"
@@ -548,18 +548,18 @@ export default function AdminSessionsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200">
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-zinc-200">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-semibold text-xs cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-zinc-100 text-zinc-700 font-semibold text-xs cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs cursor-pointer"
                 >
                   {saving ? "Menyimpan..." : "Simpan Sesi Ujian"}
                 </button>

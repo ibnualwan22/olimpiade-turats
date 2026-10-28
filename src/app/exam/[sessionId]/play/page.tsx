@@ -232,8 +232,8 @@ export default function ExamPlayPage({
 
   if (loading || !attempt || !sessionInfo) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-sm font-medium text-slate-500 animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+        <div className="text-sm font-medium text-zinc-500 animate-pulse">
           Menyiapkan lembar soal ujian...
         </div>
       </div>
@@ -248,10 +248,10 @@ export default function ExamPlayPage({
     const secs = attempt.timeSpentSeconds ? attempt.timeSpentSeconds % 60 : 0;
 
     return (
-      <div className="min-h-screen bg-slate-100 py-10 px-4 flex items-center justify-center">
-        <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-          <div className="bg-emerald-950 text-white p-8 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-800/80 border border-amber-400/40 flex items-center justify-center mx-auto mb-4 text-amber-300">
+      <div className="min-h-screen bg-zinc-100 py-10 px-4 flex items-center justify-center">
+        <div className="max-w-xl w-full bg-white rounded-xl shadow-xl border border-zinc-200 overflow-hidden">
+          <div className="bg-zinc-900 text-white p-8 text-center">
+            <div className="w-16 h-16 rounded-xl bg-zinc-800/80 border border-amber-400/40 flex items-center justify-center mx-auto mb-4 text-amber-300">
               <CheckCircle2 className="w-9 h-9" />
             </div>
             <p dir="rtl" className="font-arabic text-2xl text-amber-300 mb-1">
@@ -260,20 +260,20 @@ export default function ExamPlayPage({
             <h1 className="text-2xl font-extrabold">
               Ujian Telah Diselesaikan!
             </h1>
-            <p className="text-xs text-emerald-200 mt-1">
+            <p className="text-xs text-zinc-300 mt-1">
               {sessionInfo.title}
             </p>
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center">
-              <div className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+              <div className="text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
                 Total Nilai Akhir Anda
               </div>
-              <div className="text-5xl font-black text-emerald-950">
+              <div className="text-5xl font-black text-zinc-900">
                 {attempt.finalScore}
               </div>
-              <div className="text-xs text-emerald-700 mt-2">
+              <div className="text-xs text-amber-700 mt-2">
                 Diselesaikan dalam waktu{" "}
                 <strong>
                   {mins} menit {secs} detik
@@ -282,12 +282,12 @@ export default function ExamPlayPage({
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <div className="text-xs text-slate-500 flex items-center gap-1">
-                  <Trophy className="w-3.5 h-3.5 text-emerald-600" /> Skor Bobot
+              <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+                <div className="text-xs text-zinc-500 flex items-center gap-1">
+                  <Trophy className="w-3.5 h-3.5 text-amber-600" /> Skor Bobot
                   Jawaban
                 </div>
-                <div className="text-xl font-bold text-slate-900 mt-1">
+                <div className="text-xl font-bold text-zinc-900 mt-1">
                   {attempt.rawScore}
                   {attempt.penaltyScore > 0 && (
                     <span className="text-xs text-red-600 ml-1">
@@ -309,7 +309,7 @@ export default function ExamPlayPage({
 
             <button
               onClick={() => router.push("/exam")}
-              className="w-full py-3.5 px-4 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-sm flex items-center justify-center gap-2 transition cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-sm flex items-center justify-center gap-2 transition cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Kembali ke Portal Peserta</span>
@@ -349,15 +349,15 @@ export default function ExamPlayPage({
       : "text-lg sm:text-xl";
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col">
+    <div className="min-h-screen bg-zinc-100 flex flex-col">
       {/* Sticky Exam Top Bar */}
-      <header className="sticky top-0 z-30 bg-emerald-950 text-white border-b border-emerald-800 shadow-md">
+      <header className="sticky top-0 z-30 bg-zinc-900 text-white border-b border-zinc-800 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <h1 className="font-bold text-sm sm:text-base truncate">
               {sessionInfo.title}
             </h1>
-            <div className="flex items-center gap-3 text-xs text-emerald-300">
+            <div className="flex items-center gap-3 text-xs text-amber-300">
               <span>
                 Terjawab: {answeredCount}/{questions.length}
               </span>
@@ -378,7 +378,7 @@ export default function ExamPlayPage({
               className={`px-4 py-2 rounded-xl font-mono font-black text-base sm:text-lg flex items-center gap-2 border ${
                 remainingSeconds !== null && remainingSeconds < 300
                   ? "bg-red-600 text-white border-red-400 animate-pulse"
-                  : "bg-emerald-900/90 text-amber-300 border-amber-400/30"
+                  : "bg-zinc-800/90 text-amber-300 border-amber-400/30"
               }`}
             >
               <Clock className="w-4 h-4" />
@@ -387,7 +387,7 @@ export default function ExamPlayPage({
 
             <button
               onClick={() => setShowConfirmModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow transition cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow transition cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Selesai &amp; Kumpulkan</span>
@@ -402,16 +402,16 @@ export default function ExamPlayPage({
         {/* Question Card (Left 8/12) */}
         <div className="lg:col-span-8 flex flex-col gap-4">
           {currentQuestion && (
-            <div className="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden flex-1 flex flex-col justify-between">
+            <div className="bg-white rounded-xl shadow-xs border border-zinc-200 overflow-hidden flex-1 flex flex-col justify-between">
               <div>
                 {/* Question Header Bar */}
-                <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <div className="px-6 py-4 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
-                    <span className="px-3 py-1 rounded-lg bg-emerald-800 text-white font-bold text-xs">
+                    <span className="px-3 py-1 rounded-lg bg-zinc-900 text-white font-bold text-xs">
                       SOAL NO. {currentIdx + 1}
                     </span>
                     {currentQuestion.category && (
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold text-xs">
+                      <span className="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-semibold text-xs">
                         {currentQuestion.category.name}
                       </span>
                     )}
@@ -421,15 +421,15 @@ export default function ExamPlayPage({
                   </div>
 
                   {/* Font Size Adjuster */}
-                  <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-1">
-                    <Type className="w-3.5 h-3.5 text-slate-400 mx-1.5" />
+                  <div className="flex items-center gap-1 bg-white border border-zinc-200 rounded-lg p-1">
+                    <Type className="w-3.5 h-3.5 text-zinc-400 mx-1.5" />
                     <button
                       type="button"
                       onClick={() => setFontScale("normal")}
                       className={`px-2 py-0.5 rounded text-xs font-bold cursor-pointer ${
                         fontScale === "normal"
-                          ? "bg-emerald-700 text-white"
-                          : "text-slate-600 hover:bg-slate-100"
+                          ? "bg-zinc-900 text-white"
+                          : "text-zinc-600 hover:bg-zinc-100"
                       }`}
                     >
                       A-
@@ -439,8 +439,8 @@ export default function ExamPlayPage({
                       onClick={() => setFontScale("large")}
                       className={`px-2 py-0.5 rounded text-xs font-bold cursor-pointer ${
                         fontScale === "large"
-                          ? "bg-emerald-700 text-white"
-                          : "text-slate-600 hover:bg-slate-100"
+                          ? "bg-zinc-900 text-white"
+                          : "text-zinc-600 hover:bg-zinc-100"
                       }`}
                     >
                       A
@@ -450,8 +450,8 @@ export default function ExamPlayPage({
                       onClick={() => setFontScale("xlarge")}
                       className={`px-2 py-0.5 rounded text-xs font-bold cursor-pointer ${
                         fontScale === "xlarge"
-                          ? "bg-emerald-700 text-white"
-                          : "text-slate-600 hover:bg-slate-100"
+                          ? "bg-zinc-900 text-white"
+                          : "text-zinc-600 hover:bg-zinc-100"
                       }`}
                     >
                       A+
@@ -463,7 +463,7 @@ export default function ExamPlayPage({
                 <div className="p-6 sm:p-8">
                   <div
                     dir={currentQuestion.direction === "RTL" ? "rtl" : "ltr"}
-                    className={`p-6 rounded-2xl bg-amber-50/40 border border-amber-200/60 text-slate-900 whitespace-pre-line ${
+                    className={`p-6 rounded-xl bg-amber-50/40 border border-amber-200/60 text-zinc-900 whitespace-pre-line ${
                       currentQuestion.direction === "RTL"
                         ? `font-arabic ${arabicSizeClass} text-right`
                         : "text-base sm:text-lg leading-relaxed"
@@ -490,15 +490,15 @@ export default function ExamPlayPage({
                           }
                           className={`w-full p-4 rounded-xl border-2 transition flex items-center gap-4 text-left cursor-pointer ${
                             isSelected
-                              ? "border-emerald-600 bg-emerald-50/70 shadow-xs"
-                              : "border-slate-200 hover:border-emerald-300 bg-white"
+                              ? "border-amber-500 bg-amber-50/70 shadow-xs"
+                              : "border-zinc-200 hover:border-amber-300 bg-white"
                           }`}
                         >
                           <div
                             className={`w-9 h-9 rounded-xl font-bold text-sm flex items-center justify-center shrink-0 transition ${
                               isSelected
-                                ? "bg-emerald-700 text-white"
-                                : "bg-slate-100 text-slate-700"
+                                ? "bg-zinc-900 text-white"
+                                : "bg-zinc-100 text-zinc-700"
                             }`}
                           >
                             {opt.label}
@@ -509,7 +509,7 @@ export default function ExamPlayPage({
                             className={`flex-1 ${
                               opt.direction === "RTL"
                                 ? `font-arabic ${optionArabicSizeClass} text-right`
-                                : "text-sm sm:text-base text-slate-800"
+                                : "text-sm sm:text-base text-zinc-800"
                             }`}
                           >
                             {opt.content}
@@ -522,12 +522,12 @@ export default function ExamPlayPage({
               </div>
 
               {/* Bottom Navigation Controls */}
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+              <div className="px-6 py-4 bg-zinc-50 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-3">
                 <button
                   type="button"
                   disabled={currentIdx === 0}
                   onClick={() => setCurrentIdx((i) => Math.max(0, i - 1))}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-40 text-slate-700 font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 disabled:opacity-40 text-zinc-700 font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span>Soal Sebelumnya</span>
@@ -544,7 +544,7 @@ export default function ExamPlayPage({
                   }
                   className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 border transition cursor-pointer ${
                     currentAnswer.isDoubtful
-                      ? "bg-amber-400 text-slate-950 border-amber-500"
+                      ? "bg-amber-400 text-zinc-950 border-amber-500"
                       : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100"
                   }`}
                 >
@@ -562,7 +562,7 @@ export default function ExamPlayPage({
                     onClick={() =>
                       setCurrentIdx((i) => Math.min(questions.length - 1, i + 1))
                     }
-                    className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>Soal Selanjutnya</span>
                     <ChevronRight className="w-4 h-4" />
@@ -571,7 +571,7 @@ export default function ExamPlayPage({
                   <button
                     type="button"
                     onClick={() => setShowConfirmModal(true)}
-                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
                     <span>Selesai Ujian</span>
@@ -584,8 +584,8 @@ export default function ExamPlayPage({
 
         {/* Question Number Grid Sidebar (Right 4/12) */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-5">
-            <h2 className="font-bold text-sm text-slate-900 mb-3">
+          <div className="bg-white rounded-xl shadow-xs border border-zinc-200 p-5">
+            <h2 className="font-bold text-sm text-zinc-900 mb-3">
               Navigasi Nomor Soal
             </h2>
 
@@ -597,11 +597,11 @@ export default function ExamPlayPage({
                 const isDoubt = Boolean(ans?.isDoubtful);
 
                 let btnStyle =
-                  "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200";
+                  "bg-zinc-100 text-zinc-700 border-zinc-200 hover:bg-zinc-200";
                 if (isDoubt) {
-                  btnStyle = "bg-amber-400 text-slate-950 border-amber-500";
+                  btnStyle = "bg-amber-400 text-zinc-950 border-amber-500";
                 } else if (isAnswered) {
-                  btnStyle = "bg-emerald-700 text-white border-emerald-800";
+                  btnStyle = "bg-zinc-900 text-white border-zinc-800";
                 }
 
                 return (
@@ -610,7 +610,7 @@ export default function ExamPlayPage({
                     type="button"
                     onClick={() => setCurrentIdx(idx)}
                     className={`h-11 rounded-xl font-bold text-xs border-2 transition flex flex-col items-center justify-center cursor-pointer ${btnStyle} ${
-                      isCurrent ? "ring-2 ring-offset-2 ring-emerald-600" : ""
+                      isCurrent ? "ring-2 ring-offset-2 ring-amber-500" : ""
                     }`}
                   >
                     <span>{idx + 1}</span>
@@ -619,9 +619,9 @@ export default function ExamPlayPage({
               })}
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-3 gap-2 text-[11px] text-slate-600">
+            <div className="mt-5 pt-4 border-t border-zinc-100 grid grid-cols-3 gap-2 text-xs text-zinc-600">
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded bg-emerald-700 inline-block" />
+                <span className="w-3 h-3 rounded bg-zinc-900 inline-block" />
                 <span>Terjawab ({answeredCount})</span>
               </div>
               <div className="flex items-center gap-1.5">
@@ -629,18 +629,18 @@ export default function ExamPlayPage({
                 <span>Ragu ({doubtfulCount})</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded bg-slate-200 inline-block" />
+                <span className="w-3 h-3 rounded bg-zinc-200 inline-block" />
                 <span>Kosong ({questions.length - answeredCount})</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-emerald-950 text-white rounded-2xl p-5 space-y-2">
+          <div className="bg-zinc-900 text-white rounded-xl p-5 space-y-2">
             <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
               <Zap className="w-4 h-4" />
               <span>Info Penilaian Kecepatan</span>
             </div>
-            <p className="text-xs text-emerald-100/80 leading-relaxed">
+            <p className="text-xs text-zinc-300 leading-relaxed">
               Semakin cepat Anda menyelesaikan ujian dengan jawaban yang{" "}
               <strong>tepat</strong>, semakin besar tambahan poin kecepatan yang
               Anda peroleh.
@@ -651,19 +651,19 @@ export default function ExamPlayPage({
 
       {/* Modal Konfirmasi Selesai Ujian */}
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 z-50 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 space-y-4">
             <div className="flex items-center gap-3 text-amber-600">
               <AlertTriangle className="w-7 h-7 shrink-0" />
-              <h3 className="text-lg font-bold text-slate-900">
+              <h3 className="text-lg font-bold text-zinc-900">
                 Kumpulkan Jawaban Sekarang?
               </h3>
             </div>
 
-            <div className="text-sm text-slate-600 space-y-2">
+            <div className="text-sm text-zinc-600 space-y-2">
               <p>
                 Anda telah menjawab{" "}
-                <strong className="text-slate-900">
+                <strong className="text-zinc-900">
                   {answeredCount} dari {questions.length} soal
                 </strong>
                 .
@@ -679,7 +679,7 @@ export default function ExamPlayPage({
                   Masih ada {doubtfulCount} soal yang ditandai Ragu-ragu.
                 </p>
               )}
-              <p className="text-xs text-slate-500 pt-1">
+              <p className="text-xs text-zinc-500 pt-1">
                 Setelah dikumpulkan, waktu pengerjaan Anda akan dikunci dan skor
                 akhir beserta bonus kecepatan langsung dihitung.
               </p>
@@ -689,7 +689,7 @@ export default function ExamPlayPage({
               <button
                 type="button"
                 onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-xs cursor-pointer"
               >
                 Periksa Kembali
               </button>
@@ -697,7 +697,7 @@ export default function ExamPlayPage({
                 type="button"
                 disabled={submitting}
                 onClick={() => handleSubmitExam(attempt.id)}
-                className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs cursor-pointer"
               >
                 {submitting ? "Mengumpulkan..." : "Ya, Selesai & Kumpulkan"}
               </button>
