@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  PARTICIPANT
+}
+
+enum TextDirection {
+  RTL
+  LTR
+}
+
+enum SpeedScoringMode {
+  BONUS_POINTS
+  TIE_BREAKER
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  TIME_UP
+}
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  name         String
+  passwordHash String
+  role         Role          @default(PARTICIPANT)
+  institution  String?
+  phone        String?
+  category     String?
+  isActive     Boolean       @default(true)
+  attempts     ExamAttempt[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model QuestionCategory {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  questions   Question[]
+  createdAt   DateTime   @default(now())
+}
+
+model Question {
+  id          String            @id @default(cuid())
+  categoryId  String?
+  category    QuestionCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  content     String            @db.Text
+  direction   TextDirection     @default(RTL)
+  weight      Float             @default(4.0)
+  explanation String?           @db.Text
+  options     QuestionOption[]
+  sessions    SessionQuestion[]
+  answers     AttemptAnswer[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model QuestionOption {
+  id         String          @id @default(cuid())
+  questionId String
+  question   Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  label      String
+  content    String          @db.Text
+  direction  TextDirection   @default(RTL)
+  isCorrect  Boolean         @default(false)
+  answers    AttemptAnswer[]
+}
+
+model ExamSession {
+  id               String            @id @default(cuid())
+  title            String
+  description      String?           @db.Text
+  rulesContent     String            @db.Text
+  accessToken      String            @unique
+  durationMinutes  Int               @default(60)
+  isActive         Boolean           @default(false)
+  startTime        DateTime?
+  endTime          DateTime?
+  shuffleQuestions Boolean           @default(true)
+  shuffleOptions   Boolean           @default(false)
+  wrongPenalty     Float             @default(0.0)
+  speedScoringMode SpeedScoringMode  @default(BONUS_POINTS)
+  maxSpeedBonus    Float             @default(20.0)
+  questions        SessionQuestion[]
+  attempts         ExamAttempt[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model SessionQuestion {
+  id         String      @id @default(cuid())
+  sessionId  String
+  session    ExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  orderIndex Int         @default(0)
+
+  @@unique([sessionId, questionId])
+}
+
+model ExamAttempt {
+  id               String          @id @default(cuid())
+  userId           String
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId        String
+  session          ExamSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  status           AttemptStatus   @default(IN_PROGRESS)
+  tokenVerifiedAt  DateTime        @default(now())
+  startedAt        DateTime?
+  expiresAt        DateTime?
+  extraMinutes     Int             @default(0)
+  finishedAt       DateTime?
+  timeSpentSeconds Int?
+  rawScore         Float           @default(0)
+  penaltyScore     Float           @default(0)
+  speedBonus       Float           @default(0)
+  finalScore       Float           @default(0)
+  questionOrder    Json?
+  answers          AttemptAnswer[]
+  updatedAt        DateTime        @updatedAt
+
+  @@unique([userId, sessionId])
+}
+
+model AttemptAnswer {
+  id               String          @id @default(cuid())
+  attemptId        String
+  attempt          ExamAttempt     @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId       String
+  question         Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOptionId String?
+  selectedOption   QuestionOption? @relation(fields: [selectedOptionId], references: [id], onDelete: SetNull)
+  isDoubtful       Boolean         @default(false)
+  answeredAt       DateTime        @default(now())
+
+  @@unique([attemptId, questionId])
+}
+
