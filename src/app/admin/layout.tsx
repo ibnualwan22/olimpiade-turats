@@ -36,15 +36,17 @@ function SidebarContent({
 }) {
   return (
     <div className="flex flex-col h-full">
-      <div className="p-5 border-b border-zinc-800 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
-          <BookOpen className="w-5 h-5" />
-        </div>
+      <div className="p-5 border-b border-zinc-200 flex items-center gap-3">
+        <img
+          src="/images/logo-markaz-turats.jpg"
+          alt="Logo Markaz Turats"
+          className="h-10 w-auto shrink-0 rounded-sm"
+        />
         <div className="min-w-0">
-          <div className="font-bold text-sm tracking-tight text-white truncate">
+          <div className="font-bold text-sm tracking-tight text-zinc-900 truncate">
             Olimpiade Turats
           </div>
-          <div className="text-xs text-amber-300">Panel Admin &amp; Panitia</div>
+          <div className="text-xs text-orange-700">Panel Admin &amp; Panitia</div>
         </div>
       </div>
 
@@ -63,8 +65,8 @@ function SidebarContent({
               onClick={onNavigate}
               className={`px-3.5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3 transition ${
                 isActive
-                  ? "bg-amber-400 text-zinc-950 font-bold"
-                  : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                  ? "bg-orange-600 text-white font-bold"
+                  : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
               }`}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -74,11 +76,11 @@ function SidebarContent({
         })}
       </nav>
 
-      <div className="p-4 border-t border-zinc-800 space-y-2">
+      <div className="p-4 border-t border-zinc-200 space-y-2">
         <Link
           href="/exam"
           onClick={onNavigate}
-          className="w-full px-3.5 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium flex items-center justify-between transition"
+          className="w-full px-3.5 py-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium flex items-center justify-between transition"
         >
           <span>Lihat Portal Peserta</span>
           <ExternalLink className="w-3.5 h-3.5" />
@@ -112,7 +114,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-zinc-100 flex">
       {/* Sidebar desktop */}
-      <aside className="hidden lg:block w-64 shrink-0 bg-zinc-900 text-white border-r border-zinc-800">
+      <aside className="hidden lg:block w-64 shrink-0 bg-white text-zinc-900 border-r border-zinc-200">
         <SidebarContent
           pathname={pathname}
           onNavigate={() => {}}
@@ -127,11 +129,11 @@ export default function AdminLayout({
             className="absolute inset-0 bg-zinc-950/60"
             onClick={() => setDrawerOpen(false)}
           />
-          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-zinc-900 text-white shadow-2xl">
+          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-white text-zinc-900 shadow-2xl">
             <button
               onClick={() => setDrawerOpen(false)}
               aria-label="Tutup menu"
-              className="absolute top-4 right-4 p-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white transition cursor-pointer"
+              className="absolute top-4 right-4 p-2 rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -147,24 +149,26 @@ export default function AdminLayout({
       {/* Kolom utama */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Bar atas mobile */}
-        <header className="lg:hidden sticky top-0 z-40 bg-zinc-900 text-white border-b border-zinc-800">
+        <header className="lg:hidden sticky top-0 z-40 bg-white text-zinc-900 border-b border-zinc-200">
           <div className="px-4 h-14 flex items-center gap-3">
             <button
               onClick={() => setDrawerOpen(true)}
               aria-label="Buka menu"
-              className="p-2 -ml-2 rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white transition cursor-pointer"
+              className="p-2 -ml-2 rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition cursor-pointer"
             >
               <Menu className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
-                <BookOpen className="w-4 h-4" />
-              </div>
+              <img
+                src="/images/logo-markaz-turats.jpg"
+                alt="Logo Markaz Turats"
+                className="h-8 w-auto shrink-0 rounded-sm"
+              />
               <div className="leading-tight min-w-0">
                 <div className="font-bold text-sm truncate">
                   Olimpiade Turats
                 </div>
-                <div className="text-xs text-amber-300">Panel Admin</div>
+                <div className="text-xs text-orange-700">Panel Admin</div>
               </div>
             </div>
           </div>

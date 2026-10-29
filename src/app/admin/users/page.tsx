@@ -161,7 +161,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="p-4">
                       {u.role === "ADMIN" ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-bold">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-900 text-xs font-bold">
                           <ShieldCheck className="w-3.5 h-3.5" /> ADMIN PANITIA
                         </span>
                       ) : (
@@ -218,7 +218,7 @@ export default function AdminUsersPage() {
                       </div>
                     </div>
                     {u.role === "ADMIN" ? (
-                      <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-bold">
+                      <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-900 text-xs font-bold">
                         <ShieldCheck className="w-3.5 h-3.5" /> ADMIN
                       </span>
                     ) : (

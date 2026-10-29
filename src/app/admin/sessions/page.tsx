@@ -237,7 +237,7 @@ export default function AdminSessionsPage() {
                     >
                       {s.isActive ? "Sesi Aktif / Dibuka" : "Ditutup"}
                     </span>
-                    <span className="px-3 py-0.5 rounded-lg bg-amber-100 border border-amber-300 text-amber-950 font-mono font-bold text-xs flex items-center gap-1.5">
+                    <span className="px-3 py-0.5 rounded-lg bg-orange-100 border border-orange-300 text-orange-950 font-mono font-bold text-xs flex items-center gap-1.5">
                       <KeyRound className="w-3.5 h-3.5" />
                       TOKEN: {s.accessToken}
                     </span>
@@ -287,11 +287,11 @@ export default function AdminSessionsPage() {
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200">
-                  <div className="text-xs text-amber-800 flex items-center gap-1">
+                <div className="p-3 rounded-xl bg-orange-50/60 border border-orange-200">
+                  <div className="text-xs text-orange-800 flex items-center gap-1">
                     <Zap className="w-3.5 h-3.5" /> Mode Kecepatan
                   </div>
-                  <div className="text-sm font-bold text-amber-950 mt-0.5">
+                  <div className="text-sm font-bold text-orange-950 mt-0.5">
                     {s.speedScoringMode === "BONUS_POINTS"
                       ? `Bonus Poin (Max +${s.maxSpeedBonus})`
                       : "Penentu Seri (Tie-Breaker)"}
@@ -501,7 +501,7 @@ export default function AdminSessionsPage() {
                           : bankQuestions.map((q) => q.id)
                       )
                     }
-                    className="text-xs font-bold text-amber-700 hover:underline cursor-pointer"
+                    className="text-xs font-bold text-orange-700 hover:underline cursor-pointer"
                   >
                     {selectedQuestionIds.length === bankQuestions.length
                       ? "Hapus Semua Pilihan"
@@ -525,7 +525,7 @@ export default function AdminSessionsPage() {
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 text-xs text-zinc-500">
-                            <span className="font-semibold text-amber-700">
+                            <span className="font-semibold text-orange-700">
                               {q.category?.name || "Umum"}
                             </span>
                             <span>•</span>

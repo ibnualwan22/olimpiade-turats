@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
-  BookOpen,
   KeyRound,
   BookMarked,
   Timer,
@@ -11,9 +10,6 @@ import {
   ArrowRight,
   CheckCircle2,
   LogIn,
-  ShieldCheck,
-  Clock,
-  Award,
   Users,
   UserPlus,
   CalendarDays,
@@ -143,38 +139,6 @@ export default async function HomePage() {
         Lewati ke konten utama
       </a>
 
-      {/* Top Utility Bar (Consulotion Style) */}
-      <div className="bg-[var(--color-surface-raised)] border-b border-[var(--color-border-muted)]">
-        <div className="max-w-6xl mx-auto px-[var(--space-1)] py-2.5 flex flex-wrap items-center justify-between gap-3 text-base">
-          <div className="flex items-center gap-2 text-[var(--color-text-secondary)]">
-            <span
-              className="inline-block w-2.5 h-2.5 rounded-full bg-[var(--color-surface-strong)]"
-              aria-hidden="true"
-            />
-            <span>
-              Portal Resmi CBT Kitab Kuning &bull; Olimpiade Turats 2026
-            </span>
-          </div>
-          <div className="hidden sm:flex items-center gap-[var(--space-1)] text-[var(--color-text-secondary)]">
-            <span className="flex items-center gap-1.5">
-              <Clock
-                className="w-4 h-4 text-[var(--color-surface-strong)]"
-                aria-hidden="true"
-              />
-              Server Time Sync Aktif
-            </span>
-            <span aria-hidden="true">|</span>
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck
-                className="w-4 h-4 text-[var(--color-surface-strong)]"
-                aria-hidden="true"
-              />
-              Sistem Token Terenkripsi
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Primary Navigation (Navigation 1 of 2 per DESIGN.md) */}
       <header className="sticky top-0 z-40 bg-[var(--color-surface-base)]/95 backdrop-blur border-b border-[var(--color-border-muted)]">
         <div className="max-w-6xl mx-auto px-[var(--space-1)] min-h-[76px] flex items-center justify-between gap-[var(--space-1)]">
@@ -182,14 +146,16 @@ export default async function HomePage() {
             href="/"
             className="flex items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)] transition duration-[200ms]"
           >
-            <span className="w-11 h-11 rounded-md bg-[var(--color-surface-strong)] text-[var(--color-surface-base)] flex items-center justify-center shrink-0">
-              <BookOpen className="w-6 h-6" aria-hidden="true" />
-            </span>
-            <span>
-              <span className="block font-extrabold tracking-tight text-[var(--color-text-tertiary)] text-lg leading-tight">
+            <img
+              src="/images/logo-markaz-turats.jpg"
+              alt="Logo Markaz Turats"
+              className="h-9 sm:h-11 w-auto shrink-0 rounded-sm"
+            />
+            <span className="min-w-0">
+              <span className="block font-extrabold tracking-tight text-[var(--color-text-tertiary)] text-base sm:text-lg leading-tight">
                 OLIMPIADE TURATS
               </span>
-              <span className="block text-base text-[var(--color-text-secondary)] leading-tight">
+              <span className="block text-xs sm:text-base text-[var(--color-text-secondary)] leading-tight">
                 CBT Kitab Kuning Nasional
               </span>
             </span>
@@ -221,7 +187,7 @@ export default async function HomePage() {
 
           <Link
             href="/login"
-            className="inline-flex items-center justify-center gap-2 px-[var(--space-1)] py-2.5 rounded-md bg-[var(--color-surface-strong)] hover:bg-[var(--color-surface-strong-hover)] active:bg-[var(--color-surface-strong-active)] text-[var(--color-surface-base)] font-bold text-base transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-tertiary)]"
+            className="inline-flex items-center justify-center gap-2 px-3 py-2 sm:px-[var(--space-1)] sm:py-2.5 rounded-md bg-[var(--color-surface-strong)] hover:bg-[var(--color-surface-strong-hover)] active:bg-[var(--color-surface-strong-active)] text-[var(--color-surface-base)] font-bold text-sm sm:text-base transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-tertiary)]"
           >
             <LogIn className="w-4 h-4" aria-hidden="true" />
             <span>Login Peserta</span>
@@ -247,30 +213,18 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-[var(--space-2)] items-center">
               {/* Left Column: Core Hero Content & "Login Peserta" Button */}
               <div className="lg:col-span-7">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[var(--color-surface-raised)] border border-[var(--color-border-muted)] text-[var(--color-surface-strong)] font-semibold text-base">
-                  <Award className="w-4 h-4 shrink-0" aria-hidden="true" />
-                  <span>Computer-Based Test (CBT) &bull; Edisi 2026</span>
-                </div>
-
-                <p
-                  dir="rtl"
-                  lang="ar"
-                  className="font-arabic text-2xl sm:text-3xl text-amber-400 mt-[var(--space-1)]"
-                >
-                  بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-                </p>
 
                 <h1
                   id="hero-heading"
                   className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight mt-3"
                 >
-                  Kompetisi &amp; Ujian{" "}
-                  <span className="text-amber-400">
-                    Olimpiade Turats
+                  Olimpiade Nahwu &amp; Shorof{" "}
+                  <span className="text-orange-400">
+                    Nasional
                   </span>
                 </h1>
 
-                <p className="text-base font-bold text-amber-400 mt-3">
+                <p className="text-base font-bold text-orange-400 mt-3">
                   Olimpiade Nahwu Shorof Tingkat Nasional 2026 &bull; Dalam
                   rangka memperingati Hari Santri Nasional 2026
                 </p>

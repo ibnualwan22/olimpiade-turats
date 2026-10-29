@@ -152,11 +152,11 @@ export default function AdminParticipantsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nama peserta, username, atau asal pesantren/sekolah..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:border-amber-500"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:border-orange-500"
           />
         </div>
         <div className="text-xs font-bold text-zinc-500 px-2 flex items-center gap-1.5">
-          <Users className="w-4 h-4 text-amber-700" />
+          <Users className="w-4 h-4 text-orange-700" />
           <span>{filtered.length} Peserta</span>
         </div>
       </div>
