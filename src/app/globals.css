@@ -4,13 +4,13 @@
   --background: #fafafa;
   --foreground: #18181b;
 
-  /* Token warna landing: dasar putih + abu-abu + aksen oranye (logo tetap emas/perak) */
+  /* Token warna landing: dasar putih + abu-abu + aksen emas */
   --color-surface-base: #ffffff;
   --color-surface-raised: #f4f4f5;
   --color-surface-muted: #e4e4e7;
-  --color-surface-strong: #c2410c;
-  --color-surface-strong-hover: #9a3412;
-  --color-surface-strong-active: #7c2d12;
+  --color-surface-strong: #a16207;
+  --color-surface-strong-hover: #854d0e;
+  --color-surface-strong-active: #713f12;
   --color-text-secondary: #52525b;
   --color-text-tertiary: #18181b;
   --color-border-muted: #d4d4d8;

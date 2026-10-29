@@ -205,7 +205,7 @@ export default function AdminQuestionsPage() {
             onClick={() => setShowCatModal(true)}
             className="px-4 py-2.5 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold text-xs flex items-center gap-1.5 cursor-pointer"
           >
-            <FolderPlus className="w-4 h-4 text-orange-700" />
+            <FolderPlus className="w-4 h-4 text-yellow-700" />
             <span>Kategori Materi</span>
           </button>
           <button
@@ -227,13 +227,13 @@ export default function AdminQuestionsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari teks soal atau nama kategori..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:border-orange-500"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:border-yellow-500"
           />
         </div>
         <select
           value={filterCat}
           onChange={(e) => setFilterCat(e.target.value)}
-          className="px-4 py-2 rounded-xl border border-zinc-200 text-sm bg-white outline-none focus:border-orange-500"
+          className="px-4 py-2 rounded-xl border border-zinc-200 text-sm bg-white outline-none focus:border-yellow-500"
         >
           <option value="ALL">Semua Kategori ({questions.length})</option>
           {categories.map((c) => (
@@ -266,10 +266,10 @@ export default function AdminQuestionsPage() {
                   <span className="px-2.5 py-1 rounded-lg bg-zinc-900 text-white font-bold text-xs">
                     #{idx + 1}
                   </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200 text-zinc-800 font-semibold text-xs">
+                  <span className="px-2.5 py-1 rounded-lg bg-yellow-50 border border-yellow-200 text-zinc-800 font-semibold text-xs">
                     {q.category?.name || "Tanpa Kategori"}
                   </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200 text-orange-900 font-bold text-xs">
+                  <span className="px-2.5 py-1 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-900 font-bold text-xs">
                     Bobot: {q.weight} Poin
                   </span>
                   <span className="px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 text-xs font-mono">
@@ -295,7 +295,7 @@ export default function AdminQuestionsPage() {
 
               <div
                 dir={q.direction === "RTL" ? "rtl" : "ltr"}
-                className={`p-4 rounded-xl bg-orange-50/40 border border-orange-200/60 text-zinc-900 whitespace-pre-line ${q.direction === "RTL"
+                className={`p-4 rounded-xl bg-yellow-50/40 border border-yellow-200/60 text-zinc-900 whitespace-pre-line ${q.direction === "RTL"
                   ? "font-arabic text-2xl text-right"
                   : "text-sm sm:text-base"
                   }`}
@@ -308,7 +308,7 @@ export default function AdminQuestionsPage() {
                   <div
                     key={opt.id}
                     className={`p-3 rounded-xl border flex items-center gap-3 ${opt.isCorrect
-                      ? "bg-orange-50 border-orange-400 text-zinc-900"
+                      ? "bg-yellow-50 border-yellow-400 text-zinc-900"
                       : "bg-zinc-50/70 border-zinc-200 text-zinc-700"
                       }`}
                   >
@@ -422,7 +422,7 @@ export default function AdminQuestionsPage() {
                       ? "اكتب نص السؤال هنا..."
                       : "Ketik pertanyaan soal di sini..."
                   }
-                  className={`w-full p-3.5 rounded-xl border border-zinc-300 outline-none focus:border-orange-500 ${direction === "RTL"
+                  className={`w-full p-3.5 rounded-xl border border-zinc-300 outline-none focus:border-yellow-500 ${direction === "RTL"
                     ? "font-arabic text-2xl text-right"
                     : "text-sm"
                     }`}
@@ -450,7 +450,7 @@ export default function AdminQuestionsPage() {
                           },
                         ])
                       }
-                      className="text-xs font-bold text-orange-700 hover:underline cursor-pointer"
+                      className="text-xs font-bold text-yellow-700 hover:underline cursor-pointer"
                     >
                       + Tambah Opsi E
                     </button>
@@ -461,7 +461,7 @@ export default function AdminQuestionsPage() {
                   <div
                     key={idx}
                     className={`flex items-center gap-3 p-3 rounded-xl border ${opt.isCorrect
-                      ? "border-emerald-500 bg-orange-50/50"
+                      ? "border-emerald-500 bg-yellow-50/50"
                       : "border-zinc-200 bg-zinc-50"
                       }`}
                   >

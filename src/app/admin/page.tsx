@@ -60,7 +60,7 @@ export default function AdminDashboardPage() {
       sub: `${stats.activeSessions} Sesi Aktif`,
       href: "/admin/sessions",
       icon: CalendarClock,
-      color: "bg-orange-100 text-orange-800",
+      color: "bg-yellow-100 text-yellow-800",
     },
     {
       title: "Peserta Terdaftar",
@@ -100,7 +100,7 @@ export default function AdminDashboardPage() {
             <Link
               key={c.title}
               href={c.href}
-              className="bg-white rounded-xl p-5 border border-zinc-200 shadow-xs hover:border-orange-400 transition flex flex-col justify-between"
+              className="bg-white rounded-xl p-5 border border-zinc-200 shadow-xs hover:border-yellow-400 transition flex flex-col justify-between"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`p-3 rounded-xl ${c.color}`}>
@@ -135,7 +135,7 @@ export default function AdminDashboardPage() {
               beserta bobot poinnya di menu{" "}
               <Link
                 href="/admin/questions"
-                className="text-orange-700 font-semibold underline"
+                className="text-yellow-700 font-semibold underline"
               >
                 Bank Soal &amp; Bobot
               </Link>
@@ -146,7 +146,7 @@ export default function AdminDashboardPage() {
               aturan penilaian kecepatan di menu{" "}
               <Link
                 href="/admin/sessions"
-                className="text-orange-700 font-semibold underline"
+                className="text-yellow-700 font-semibold underline"
               >
                 Manajemen Sesi
               </Link>
@@ -156,7 +156,7 @@ export default function AdminDashboardPage() {
               Daftarkan akun peserta di menu{" "}
               <Link
                 href="/admin/participants"
-                className="text-orange-700 font-semibold underline"
+                className="text-yellow-700 font-semibold underline"
               >
                 Daftar Peserta
               </Link>
@@ -167,7 +167,7 @@ export default function AdminDashboardPage() {
               di menu{" "}
               <Link
                 href="/admin/monitoring"
-                className="text-orange-700 font-semibold underline"
+                className="text-yellow-700 font-semibold underline"
               >
                 Monitoring &amp; Peringkat
               </Link>
@@ -178,7 +178,7 @@ export default function AdminDashboardPage() {
 
         <div className="bg-zinc-900 text-white rounded-xl p-6 flex flex-col justify-between">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-orange-300">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-yellow-300">
               <Clock className="w-4 h-4" /> Regulasi Fleksibel
             </div>
             <h2 className="text-xl font-bold">
@@ -194,7 +194,7 @@ export default function AdminDashboardPage() {
           <div className="pt-4 mt-4 border-t border-zinc-800 flex flex-wrap gap-3">
             <Link
               href="/admin/sessions"
-              className="px-4 py-2 rounded-xl bg-orange-400 hover:bg-orange-300 text-zinc-950 font-bold text-xs transition"
+              className="px-4 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-bold text-xs transition"
             >
               Atur Sesi &amp; Token
             </Link>

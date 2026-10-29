@@ -46,7 +46,7 @@ function SidebarContent({
           <div className="font-bold text-sm tracking-tight text-zinc-900 truncate">
             Olimpiade Turats
           </div>
-          <div className="text-xs text-orange-700">Panel Admin &amp; Panitia</div>
+          <div className="text-xs text-yellow-700">Panel Admin &amp; Panitia</div>
         </div>
       </div>
 
@@ -65,7 +65,7 @@ function SidebarContent({
               onClick={onNavigate}
               className={`px-3.5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3 transition ${
                 isActive
-                  ? "bg-orange-600 text-white font-bold"
+                  ? "bg-yellow-600 text-white font-bold"
                   : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
               }`}
             >
@@ -168,7 +168,7 @@ export default function AdminLayout({
                 <div className="font-bold text-sm truncate">
                   Olimpiade Turats
                 </div>
-                <div className="text-xs text-orange-700">Panel Admin</div>
+                <div className="text-xs text-yellow-700">Panel Admin</div>
               </div>
             </div>
           </div>

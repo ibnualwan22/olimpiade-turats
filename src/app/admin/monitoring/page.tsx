@@ -182,7 +182,7 @@ export default function AdminMonitoringPage() {
         <button
           onClick={() => setActiveTab("LEADERBOARD")}
           className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer ${activeTab === "LEADERBOARD"
-            ? "bg-orange-500 text-zinc-950"
+            ? "bg-yellow-500 text-zinc-950"
             : "bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50"
             }`}
         >
@@ -233,7 +233,7 @@ export default function AdminMonitoringPage() {
                         <td className="p-4">
                           {a.status === "IN_PROGRESS" ? (
                             a.startedAt ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-100 text-orange-900 text-xs font-bold">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-900 text-xs font-bold">
                                 <Clock className="w-3.5 h-3.5" /> Sedang
                                 Mengerjakan
                               </span>
@@ -279,7 +279,7 @@ export default function AdminMonitoringPage() {
                                   : "Belum klik mulai"}
                               </div>
                               {a.extraMinutes > 0 && (
-                                <span className="text-orange-700 font-bold">
+                                <span className="text-yellow-700 font-bold">
                                   +{a.extraMinutes}m ekstra
                                 </span>
                               )}
@@ -315,7 +315,7 @@ export default function AdminMonitoringPage() {
                                 <button
                                   onClick={() => handleAction(a.id, "ADD_TIME")}
                                   title="Tambah Waktu +5 Menit"
-                                  className="px-2.5 py-1.5 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-200 text-xs font-bold flex items-center gap-1 cursor-pointer"
+                                  className="px-2.5 py-1.5 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-900 border border-yellow-200 text-xs font-bold flex items-center gap-1 cursor-pointer"
                                 >
                                   <PlusCircle className="w-3.5 h-3.5" /> +5m
                                 </button>
@@ -324,7 +324,7 @@ export default function AdminMonitoringPage() {
                                     handleAction(a.id, "FORCE_SUBMIT")
                                   }
                                   title="Paksa Selesai & Hitung Skor"
-                                  className="px-2.5 py-1.5 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-200 text-xs font-bold cursor-pointer"
+                                  className="px-2.5 py-1.5 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-900 border border-yellow-200 text-xs font-bold cursor-pointer"
                                 >
                                   Submit
                                 </button>
@@ -365,7 +365,7 @@ export default function AdminMonitoringPage() {
                       </div>
                       {a.status === "IN_PROGRESS" ? (
                         a.startedAt ? (
-                          <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-100 text-orange-900 text-xs font-bold">
+                          <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-900 text-xs font-bold">
                             <Clock className="w-3.5 h-3.5" /> Mengerjakan
                           </span>
                         ) : (
@@ -397,7 +397,7 @@ export default function AdminMonitoringPage() {
                         <span className="ml-2">Belum klik mulai</span>
                       )}
                       {a.status === "IN_PROGRESS" && a.extraMinutes > 0 && (
-                        <span className="ml-2 text-orange-700 font-bold">
+                        <span className="ml-2 text-yellow-700 font-bold">
                           +{a.extraMinutes}m ekstra
                         </span>
                       )}
@@ -407,13 +407,13 @@ export default function AdminMonitoringPage() {
                         <>
                           <button
                             onClick={() => handleAction(a.id, "ADD_TIME")}
-                            className="flex-1 px-3 py-2 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-200 text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
+                            className="flex-1 px-3 py-2 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-900 border border-yellow-200 text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
                           >
                             <PlusCircle className="w-3.5 h-3.5" /> +5m
                           </button>
                           <button
                             onClick={() => handleAction(a.id, "FORCE_SUBMIT")}
-                            className="flex-1 px-3 py-2 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-200 text-xs font-bold cursor-pointer"
+                            className="flex-1 px-3 py-2 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-900 border border-yellow-200 text-xs font-bold cursor-pointer"
                           >
                             Submit
                           </button>
@@ -456,7 +456,7 @@ export default function AdminMonitoringPage() {
                 </thead>
                 <tbody className="divide-y divide-zinc-100 text-sm">
                   {finishedRankings.map((r, idx) => (
-                    <tr key={r.id} className="hover:bg-orange-50/30">
+                    <tr key={r.id} className="hover:bg-yellow-50/30">
                       <td className="p-4">
                         <span
                           className={`w-8 h-8 rounded-xl font-black text-xs inline-flex items-center justify-center ${idx === 0
@@ -488,8 +488,8 @@ export default function AdminMonitoringPage() {
                         )}
                       </td>
                       <td className="p-4">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200 text-orange-900 font-bold text-xs">
-                          <Zap className="w-3.5 h-3.5 text-orange-600" /> +
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-900 font-bold text-xs">
+                          <Zap className="w-3.5 h-3.5 text-yellow-600" /> +
                           {r.speedBonus}
                         </span>
                       </td>

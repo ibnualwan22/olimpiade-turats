@@ -219,12 +219,12 @@ export default async function HomePage() {
                   className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight mt-3"
                 >
                   Olimpiade Nahwu &amp; Shorof{" "}
-                  <span className="text-orange-400">
+                  <span className="text-yellow-400">
                     Nasional
                   </span>
                 </h1>
 
-                <p className="text-base font-bold text-orange-400 mt-3">
+                <p className="text-base font-bold text-yellow-400 mt-3">
                   Olimpiade Nahwu Shorof Tingkat Nasional 2026 &bull; Dalam
                   rangka memperingati Hari Santri Nasional 2026
                 </p>
