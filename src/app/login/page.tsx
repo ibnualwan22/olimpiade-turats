@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, KeyRound, User, ShieldCheck, Sparkles, ArrowRight } from "lucide-react";
+import { BookOpen, KeyRound, User, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,12 +40,6 @@ export default function LoginPage() {
       setError("Gagal terhubung ke server");
       setLoading(false);
     }
-  }
-
-  function fillDemo(u: string, p: string) {
-    setUsername(u);
-    setPassword(p);
-    setError("");
   }
 
   return (
@@ -131,7 +125,7 @@ export default function LoginPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Contoh: peserta01 atau admin"
+                  placeholder="Masukkan username / nomor peserta"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-zinc-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 outline-none text-sm transition"
                 />
               </div>
@@ -164,45 +158,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Quick Demo Credential Helper */}
-          <div className="mt-8 pt-6 border-t border-zinc-100">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
-              <span>AKUN DEMO CEPAT (KLIK UNTUK ISI OTOMATIS):</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={() => fillDemo("peserta01", "peserta123")}
-                className="p-2.5 rounded-xl border border-yellow-200 bg-yellow-50/60 hover:bg-emerald-100/70 text-left transition cursor-pointer"
-              >
-                <div className="text-xs font-bold text-zinc-900">
-                  Peserta 01
-                </div>
-                <div className="text-xs text-yellow-700">
-                  peserta01 / peserta123
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo("admin", "admin123")}
-                className="p-2.5 rounded-xl border border-yellow-200 bg-yellow-50/70 hover:bg-yellow-100/80 text-left transition cursor-pointer"
-              >
-                <div className="text-xs font-bold text-yellow-900 flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Admin Panitia
-                </div>
-                <div className="text-xs text-yellow-800">
-                  admin / admin123
-                </div>
-              </button>
-            </div>
-            <p className="mt-3 text-xs text-zinc-500 text-center">
-              Token Sesi Ujian Aktif:{" "}
-              <span className="font-mono font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded">
-                TURATS2026
-              </span>
-            </p>
-          </div>
         </div>
       </div>
     </div>
