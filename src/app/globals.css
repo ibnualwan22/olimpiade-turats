@@ -4,17 +4,17 @@
   --background: #fafafa;
   --foreground: #18181b;
 
-  /* DESIGN.md — Consulotion Semantic Tokens */
-  --color-surface-base: #000000;
-  --color-surface-raised: #333333;
-  --color-surface-muted: #727272;
-  --color-surface-strong: #7ac64d;
-  --color-surface-strong-hover: #8bd45e;
-  --color-surface-strong-active: #66ad3b;
-  --color-text-secondary: #9b9b9b;
-  --color-text-tertiary: #ffffff;
-  --color-border-muted: #444444;
-  --color-border-subtle: #9b9b9b;
+  /* Token warna landing: dasar putih + abu-abu + emas (revisi 29 Okt 2026) */
+  --color-surface-base: #ffffff;
+  --color-surface-raised: #f4f4f5;
+  --color-surface-muted: #e4e4e7;
+  --color-surface-strong: #b45309;
+  --color-surface-strong-hover: #92400e;
+  --color-surface-strong-active: #78350f;
+  --color-text-secondary: #52525b;
+  --color-text-tertiary: #18181b;
+  --color-border-muted: #d4d4d8;
+  --color-border-subtle: #e4e4e7;
   --space-1: 20px;
   --space-2: 40px;
   --motion-duration-instant: 200ms;
