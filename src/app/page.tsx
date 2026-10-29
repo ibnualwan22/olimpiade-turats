@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import {
   BookOpen,
   KeyRound,
@@ -13,6 +14,14 @@ import {
   ShieldCheck,
   Clock,
   Award,
+  Users,
+  UserPlus,
+  CalendarDays,
+  Banknote,
+  ExternalLink,
+  AtSign,
+  MessageCircle,
+  Globe,
 } from "lucide-react";
 
 // Halaman ini membaca cookie sesi lalu redirect, jadi tidak bisa di-prerender.
@@ -89,6 +98,29 @@ const SCORING = [
   },
 ];
 
+const TIMELINE = [
+  {
+    date: "16 Okt – 2 Nov 2026",
+    title: "Pendaftaran",
+    desc: "Pendaftaran peserta dibuka untuk umum, tanpa batasan usia.",
+  },
+  {
+    date: "3 Nov 2026 • 13.00–14.30 WIB",
+    title: "Simulasi Olimpiade",
+    desc: "Simulasi pelaksanaan ujian secara online melalui CBT.",
+  },
+  {
+    date: "4 Nov 2026 • 13.00–14.30 WIB",
+    title: "Pelaksanaan Olimpiade",
+    desc: "Pelaksanaan lomba secara online melalui CBT Siakad Markaz Arabiyah.",
+  },
+  {
+    date: "5 Nov 2026",
+    title: "Pengumuman Pemenang",
+    desc: "Pengumuman pemenang olimpiade.",
+  },
+];
+
 const STATS = [
   { label: "Bidang Kitab", value: "4 Cabang" },
   { label: "Jenjang Kompetisi", value: "Ulya & Wustha" },
@@ -104,6 +136,20 @@ export default async function HomePage() {
     }
     redirect("/exam");
   }
+
+  // Jumlah peserta = akun PARTICIPANT di database (definisi sama seperti
+  // /api/admin/stats). Jumlah pendaftar = peserta + 30 (instruksi user
+  // 29 Okt 2026). Bila database tidak terjangkau, strip statistik disembunyikan.
+  let totalParticipants: number | null = null;
+  try {
+    totalParticipants = await prisma.user.count({
+      where: { role: "PARTICIPANT" },
+    });
+  } catch {
+    totalParticipants = null;
+  }
+  const totalRegistrants =
+    totalParticipants === null ? null : totalParticipants + 30;
 
   return (
     <div className="font-design-system min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-tertiary)] flex flex-col selection:bg-[var(--color-surface-strong)] selection:text-[var(--color-surface-base)]">
@@ -234,6 +280,11 @@ export default async function HomePage() {
                   </span>
                 </h1>
 
+                <p className="text-base font-bold text-[var(--color-surface-strong)] mt-3">
+                  Olimpiade Nahwu Shorof Tingkat Nasional 2026 &bull; Dalam
+                  rangka memperingati Hari Santri Nasional 2026
+                </p>
+
                 <p className="text-base sm:text-lg text-[var(--color-text-secondary)] leading-relaxed max-w-2xl mt-[var(--space-1)]">
                   Platform evaluasi kitab kuning terstandarisasi untuk bidang{" "}
                   <strong className="text-[var(--color-text-tertiary)] font-semibold">
@@ -358,6 +409,92 @@ export default async function HomePage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Statistik Peserta & Pendaftar */}
+        {totalParticipants !== null && totalRegistrants !== null && (
+          <section
+            aria-labelledby="statistik-heading"
+            className="bg-[var(--color-surface-raised)] border-b border-[var(--color-border-muted)]"
+          >
+            <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)]">
+              <h2 id="statistik-heading" className="sr-only">
+                Statistik Peserta dan Pendaftar
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--space-1)]">
+                <div className="rounded-md bg-[var(--color-surface-base)] border border-[var(--color-border-muted)] p-[var(--space-1)] flex items-center gap-4">
+                  <span className="w-11 h-11 rounded-md bg-[var(--color-surface-strong)] text-[var(--color-surface-base)] flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <div className="text-4xl font-extrabold text-[var(--color-text-tertiary)]">
+                      {totalParticipants.toLocaleString("id-ID")}
+                    </div>
+                    <div className="text-base text-[var(--color-text-secondary)]">
+                      Jumlah Peserta
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-md bg-[var(--color-surface-base)] border border-[var(--color-border-muted)] p-[var(--space-1)] flex items-center gap-4">
+                  <span className="w-11 h-11 rounded-md bg-[var(--color-surface-strong)] text-[var(--color-surface-base)] flex items-center justify-center shrink-0">
+                    <UserPlus className="w-5 h-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <div className="text-4xl font-extrabold text-[var(--color-text-tertiary)]">
+                      {totalRegistrants.toLocaleString("id-ID")}
+                    </div>
+                    <div className="text-base text-[var(--color-text-secondary)]">
+                      Jumlah Pendaftar
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="text-base text-[var(--color-text-secondary)] mt-[var(--space-1)]">
+                Data diperbarui otomatis dari sistem.
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* Pamflet Resmi */}
+        <section
+          aria-labelledby="pamflet-heading"
+          className="bg-[var(--color-surface-base)] border-b border-[var(--color-border-muted)]"
+        >
+          <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)] lg:py-16">
+            <div className="max-w-2xl">
+              <p className="text-base font-bold uppercase tracking-widest text-[var(--color-surface-strong)]">
+                Pamflet Resmi
+              </p>
+              <h2
+                id="pamflet-heading"
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-tertiary)] mt-2"
+              >
+                Olimpiade Nahwu Shorof Tingkat Nasional 2026
+              </h2>
+              <p className="text-base text-[var(--color-text-secondary)] mt-2">
+                Dalam rangka memperingati Hari Santri Nasional 2026, Markaz
+                Turats Pare menyelenggarakan olimpiade terbuka untuk umum.
+                Pamflet berikut memuat syarat dan ketentuan, hadiah, serta
+                informasi pendaftaran selengkapnya.
+              </p>
+            </div>
+            <a
+              href="/images/pamflet-olimpiade-nahwu-shorof-2026.jpg"
+              target="_blank"
+              rel="noreferrer"
+              className="block max-w-2xl mx-auto mt-[var(--space-2)] rounded-md overflow-hidden border border-[var(--color-border-muted)] transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              <img
+                src="/images/pamflet-olimpiade-nahwu-shorof-2026.jpg"
+                alt="Pamflet Olimpiade Nahwu Shorof Tingkat Nasional 2026 — syarat dan ketentuan, timeline, hadiah, dan informasi pendaftaran"
+                className="w-full"
+              />
+            </a>
+            <p className="text-center text-base text-[var(--color-text-secondary)] mt-3">
+              Ketuk gambar untuk melihat ukuran penuh.
+            </p>
           </div>
         </section>
 
@@ -533,6 +670,143 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Timeline Olimpiade */}
+        <section
+          id="timeline"
+          aria-labelledby="timeline-heading"
+          className="bg-[var(--color-surface-raised)] border-b border-[var(--color-border-muted)]"
+        >
+          <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)] lg:py-16">
+            <div className="max-w-2xl">
+              <p className="text-base font-bold uppercase tracking-widest text-[var(--color-surface-strong)]">
+                Timeline Olimpiade
+              </p>
+              <h2
+                id="timeline-heading"
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-tertiary)] mt-2"
+              >
+                Jadwal Pelaksanaan
+              </h2>
+              <p className="text-base text-[var(--color-text-secondary)] mt-2">
+                Catat tanggal-tanggal penting berikut agar tidak terlewat.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--space-1)] mt-[var(--space-2)]">
+              {TIMELINE.map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-md bg-[var(--color-surface-base)] border border-[var(--color-border-muted)] p-[var(--space-1)]"
+                >
+                  <div className="flex items-center gap-2 text-[var(--color-surface-strong)]">
+                    <CalendarDays
+                      className="w-5 h-5 shrink-0"
+                      aria-hidden="true"
+                    />
+                    <span className="font-bold text-base">{item.date}</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-[var(--color-text-tertiary)] mt-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-base text-[var(--color-text-secondary)] leading-relaxed mt-2">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pendaftaran & Infaq HTM */}
+        <section
+          id="pendaftaran"
+          aria-labelledby="pendaftaran-heading"
+          className="bg-[var(--color-surface-base)] border-b border-[var(--color-border-muted)]"
+        >
+          <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)] lg:py-16">
+            <div className="max-w-2xl">
+              <p className="text-base font-bold uppercase tracking-widest text-[var(--color-surface-strong)]">
+                Pendaftaran
+              </p>
+              <h2
+                id="pendaftaran-heading"
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-tertiary)] mt-2"
+              >
+                Pendaftaran &amp; Infaq HTM
+              </h2>
+              <p className="text-base text-[var(--color-text-secondary)] mt-2">
+                Pendaftaran dibuka 16 Oktober – 2 November 2026.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--space-1)] mt-[var(--space-2)]">
+              <div className="rounded-md bg-[var(--color-surface-raised)] border border-[var(--color-border-muted)] p-[var(--space-1)]">
+                <div className="flex items-center gap-3">
+                  <span className="w-11 h-11 rounded-md bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] text-[var(--color-surface-strong)] flex items-center justify-center shrink-0">
+                    <Banknote className="w-5 h-5" aria-hidden="true" />
+                  </span>
+                  <h3 className="text-xl font-bold text-[var(--color-text-tertiary)]">
+                    Infaq HTM Rp20.000
+                  </h3>
+                </div>
+                <p className="text-base text-[var(--color-text-secondary)] mt-[var(--space-1)]">
+                  Transfer ke rekening berikut:
+                </p>
+                <p className="text-xl font-extrabold text-[var(--color-text-tertiary)] mt-2">
+                  BSI 7323337378
+                </p>
+                <p className="text-base text-[var(--color-text-secondary)]">
+                  a.n. ARUM TRIMALA
+                </p>
+              </div>
+              <div className="rounded-md bg-[var(--color-surface-raised)] border border-[var(--color-border-muted)] p-[var(--space-1)]">
+                <h3 className="text-xl font-bold text-[var(--color-text-tertiary)]">
+                  Link Pendaftaran
+                </h3>
+                <a
+                  href="https://www.markazturats.id"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-base font-bold text-[var(--color-surface-strong)] hover:underline mt-2 rounded-sm transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+                >
+                  www.markazturats.id
+                  <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                </a>
+                <ul className="space-y-2 mt-[var(--space-1)] text-base text-[var(--color-text-secondary)]">
+                  <li className="flex items-center gap-2">
+                    <AtSign
+                      className="w-4 h-4 text-[var(--color-surface-strong)] shrink-0"
+                      aria-hidden="true"
+                    />
+                    Instagram: @markaz_turats
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <MessageCircle
+                      className="w-4 h-4 text-[var(--color-surface-strong)] shrink-0"
+                      aria-hidden="true"
+                    />
+                    WhatsApp: 08197982788
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Globe
+                      className="w-4 h-4 text-[var(--color-surface-strong)] shrink-0"
+                      aria-hidden="true"
+                    />
+                    Website: markazturats.id
+                  </li>
+                </ul>
+                <a
+                  href="https://www.markazturats.id"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-[var(--space-1)] inline-flex items-center justify-center gap-2 px-[var(--space-1)] py-3 rounded-md bg-[var(--color-surface-strong)] hover:bg-[var(--color-surface-strong-hover)] active:bg-[var(--color-surface-strong-active)] text-[var(--color-surface-base)] font-extrabold text-base transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-tertiary)]"
+                >
+                  Daftar Sekarang
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Bottom CTA Section */}
         <section
           aria-labelledby="cta-heading"
@@ -585,6 +859,18 @@ export default async function HomePage() {
               className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)] rounded-sm transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
             >
               Alur
+            </a>
+            <a
+              href="#timeline"
+              className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)] rounded-sm transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              Timeline
+            </a>
+            <a
+              href="#pendaftaran"
+              className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)] rounded-sm transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              Pendaftaran
             </a>
             <Link
               href="/login"
