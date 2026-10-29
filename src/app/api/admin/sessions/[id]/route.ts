@@ -93,6 +93,37 @@ export async function PUT(
   }
 }
 
+// Tombol on/off cepat dari daftar sesi — hanya membalik isActive,
+// tanpa menyentuh kolom lain. (PUT penuh berisiko mereset kolom yang
+// tidak dikirim ke nilai default, jadi toggle tidak memakai PUT.)
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  const { id } = await params;
+  const body = await req.json();
+  const { isActive } = body;
+
+  if (typeof isActive !== "boolean") {
+    return NextResponse.json(
+      { error: "isActive harus boolean" },
+      { status: 400 }
+    );
+  }
+
+  const updated = await prisma.examSession.update({
+    where: { id },
+    data: { isActive },
+  });
+
+  return NextResponse.json({ session: updated });
+}
+
 export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }

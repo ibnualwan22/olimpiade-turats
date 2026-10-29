@@ -11,6 +11,7 @@ import {
   RefreshCw,
   CheckSquare,
   X,
+  Power,
 } from "lucide-react";
 
 interface SessionItem {
@@ -70,6 +71,7 @@ export default function AdminSessionsPage() {
 
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [rulesContent, setRulesContent] = useState("");
@@ -211,6 +213,41 @@ export default function AdminSessionsPage() {
     }
   }
 
+  async function handleToggleActive(s: SessionItem) {
+    const next = !s.isActive;
+    if (
+      !confirm(
+        next
+          ? `Buka sesi "${s.title}"? Peserta bisa verifikasi token dan memulai ujian.`
+          : `Tutup sesi "${s.title}"? Peserta baru tidak bisa memulai ujian. Peserta yang sedang mengerjakan tetap menyelesaikan timer pribadinya.`
+      )
+    )
+      return;
+    setTogglingId(s.id);
+    try {
+      const res = await fetch(`/api/admin/sessions/${s.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: next }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.error || "Gagal mengubah status sesi");
+        return;
+      }
+      const data = await res.json();
+      setSessions((prev) =>
+        prev.map((x) =>
+          x.id === s.id ? { ...x, isActive: data.session.isActive } : x
+        )
+      );
+    } catch {
+      alert("Gagal menghubungi server");
+    } finally {
+      setTogglingId(null);
+    }
+  }
+
   async function handleDeleteSession(id: string) {
     if (!confirm("Yakin ingin menghapus sesi ujian ini beserta data pesertanya?"))
       return;
@@ -283,6 +320,22 @@ export default function AdminSessionsPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleToggleActive(s)}
+                    disabled={togglingId === s.id}
+                    className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${
+                      s.isActive
+                        ? "border-red-200 hover:bg-red-50 text-red-600"
+                        : "border-emerald-300 bg-emerald-600 hover:bg-emerald-700 text-white"
+                    }`}
+                  >
+                    <Power className="w-3.5 h-3.5" />
+                    {togglingId === s.id
+                      ? "Menyimpan..."
+                      : s.isActive
+                        ? "Tutup Ujian"
+                        : "Buka Ujian"}
+                  </button>
                   <button
                     onClick={() => openEditModal(s)}
                     className="px-3.5 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
