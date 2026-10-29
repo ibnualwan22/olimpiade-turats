@@ -10,6 +10,7 @@ import {
   Search,
   X,
 } from "lucide-react";
+import { renderRichText } from "@/lib/safeHtml";
 
 interface OptionForm {
   label: string;
@@ -33,6 +34,20 @@ interface QuestionRecord {
     direction: "RTL" | "LTR";
     isCorrect: boolean;
   }[];
+}
+
+interface ImportPreviewRow {
+  index: number;
+  category: string;
+  categoryNew: boolean;
+  direction: "RTL" | "LTR";
+  weight: number;
+  contentHtml: string;
+  options: { label: string; html: string; plain: string }[];
+  keyLetter: string;
+  explanationHtml: string;
+  status: string;
+  errors: string[];
 }
 
 export default function AdminQuestionsPage() {
@@ -64,6 +79,15 @@ export default function AdminQuestionsPage() {
   const [showCatModal, setShowCatModal] = useState(false);
   const [newCatName, setNewCatName] = useState("");
   const [newCatDesc, setNewCatDesc] = useState("");
+
+  // Import Excel State
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [previewRows, setPreviewRows] = useState<ImportPreviewRow[] | null>(
+    null
+  );
+  const [previewError, setPreviewError] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState("");
 
   async function loadData() {
     setLoading(true);
@@ -177,6 +201,59 @@ export default function AdminQuestionsPage() {
     }
   }
 
+  async function handlePreviewUpload() {
+    if (!importFile) return;
+    setImporting(true);
+    setPreviewError("");
+    setImportResult("");
+    try {
+      const form = new FormData();
+      form.append("file", importFile);
+      const res = await fetch("/api/admin/questions/import", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPreviewError(data.error || "Gagal membaca file Excel");
+        setPreviewRows(null);
+        return;
+      }
+      setPreviewRows(data.rows || []);
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  async function handleConfirmImport() {
+    if (!previewRows) return;
+    setImporting(true);
+    try {
+      const res = await fetch("/api/admin/questions/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rows: previewRows }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Gagal mengimpor soal");
+        return;
+      }
+      const skippedText =
+        data.skipped?.length > 0
+          ? `, dilewati ${data.skipped.length}`
+          : "";
+      setImportResult(
+        `Impor selesai: ${data.created} soal dibuat${skippedText}.`
+      );
+      setPreviewRows(null);
+      setImportFile(null);
+      await loadData();
+    } finally {
+      setImporting(false);
+    }
+  }
+
   const filteredQuestions = questions.filter((q) => {
     const matchCat = filterCat === "ALL" || q.categoryId === filterCat;
     const matchSearch =
@@ -244,6 +321,113 @@ export default function AdminQuestionsPage() {
         </select>
       </div>
 
+      {/* Impor Soal dari Excel */}
+      <div className="bg-white rounded-xl border border-zinc-200 p-4 space-y-4 shadow-xs">
+        <div>
+          <h2 className="text-sm font-extrabold text-zinc-900">
+            Impor Soal dari Excel
+          </h2>
+          <p className="text-xs text-zinc-500 mt-0.5">
+            Kolom: Kategori | Arah | Bobot | Soal | Opsi A | Opsi B | Opsi
+            C | Opsi D | Kunci | Pembahasan. Format tebal, garis bawah, dan
+            miring pada sel ikut terimpor; karakter liar dibersihkan otomatis
+            dan harakat dipertahankan. Kategori yang belum ada dibuat baru.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-2">
+          <a
+            href="/api/admin/questions/import-template"
+            className="px-4 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold text-center cursor-pointer"
+          >
+            Unduh Template Excel
+          </a>
+          <input
+            type="file"
+            accept=".xlsx"
+            onChange={(e) => {
+              setImportFile(e.target.files?.[0] || null);
+              setPreviewRows(null);
+              setPreviewError("");
+            }}
+            className="flex-1 px-3 py-2 rounded-xl border border-zinc-200 text-xs"
+          />
+          <button
+            onClick={handlePreviewUpload}
+            disabled={!importFile || importing}
+            className="px-4 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold disabled:opacity-50 cursor-pointer"
+          >
+            {importing ? "Memproses..." : "Pratinjau Impor"}
+          </button>
+        </div>
+
+        {previewError && (
+          <p className="text-xs font-bold text-red-600">{previewError}</p>
+        )}
+        {importResult && (
+          <p className="text-xs font-bold text-emerald-700">{importResult}</p>
+        )}
+
+        {previewRows && (
+          <div className="space-y-3">
+            <div className="overflow-x-auto border border-zinc-200 rounded-xl">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="bg-zinc-50 border-b border-zinc-200 font-bold text-zinc-500">
+                    <th className="p-2.5">Baris</th>
+                    <th className="p-2.5">Soal</th>
+                    <th className="p-2.5">Kategori</th>
+                    <th className="p-2.5">Bobot</th>
+                    <th className="p-2.5">Kunci</th>
+                    <th className="p-2.5">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  {previewRows.map((r, i) => (
+                    <tr key={i}>
+                      <td className="p-2.5">{r.index}</td>
+                      <td className="p-2.5 max-w-100">
+                        {renderRichText(r.contentHtml)}
+                      </td>
+                      <td className="p-2.5">
+                        {r.category || "-"}
+                        {r.categoryNew && " (baru)"}
+                      </td>
+                      <td className="p-2.5">{r.weight}</td>
+                      <td className="p-2.5">{r.keyLetter}</td>
+                      <td className="p-2.5">
+                        {r.status === "valid" ? (
+                          "Valid"
+                        ) : (
+                          <span className="text-red-600 font-bold">
+                            {r.errors.join("; ")}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setPreviewRows(null)}
+                className="px-4 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleConfirmImport}
+                disabled={importing}
+                className="px-5 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold disabled:opacity-50 cursor-pointer"
+              >
+                {importing ? "Mengimpor..." : "Konfirmasi & Buat Soal"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Question List */}
       {loading ? (
         <div className="p-12 text-center text-sm text-zinc-500">
@@ -300,7 +484,7 @@ export default function AdminQuestionsPage() {
                   : "text-sm sm:text-base"
                   }`}
               >
-                {q.content}
+                {renderRichText(q.content)}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -327,7 +511,7 @@ export default function AdminQuestionsPage() {
                         : "text-xs sm:text-sm"
                         }`}
                     >
-                      {opt.content}
+                      {renderRichText(opt.content)}
                     </span>
                     {opt.isCorrect && (
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />

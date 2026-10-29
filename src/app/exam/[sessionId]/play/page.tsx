@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, use } from "react";
+import { renderRichText } from "@/lib/safeHtml";
 import { useRouter } from "next/navigation";
 import {
   Clock,
@@ -469,7 +470,7 @@ export default function ExamPlayPage({
                         : "text-base sm:text-lg leading-relaxed"
                     }`}
                   >
-                    {currentQuestion.content}
+                    {renderRichText(currentQuestion.content)}
                   </div>
 
                   {/* Options List */}
@@ -512,7 +513,7 @@ export default function ExamPlayPage({
                                 : "text-sm sm:text-base text-zinc-800"
                             }`}
                           >
-                            {opt.content}
+                            {renderRichText(opt.content)}
                           </div>
                         </button>
                       );

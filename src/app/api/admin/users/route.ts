@@ -25,8 +25,14 @@ export async function GET(req: Request) {
       institution: true,
       phone: true,
       category: true,
+      email: true,
       isActive: true,
       createdAt: true,
+      emailLogs: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { status: true, createdAt: true },
+      },
       _count: {
         select: { attempts: true },
       },

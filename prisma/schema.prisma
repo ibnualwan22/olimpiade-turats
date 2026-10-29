@@ -37,10 +37,27 @@ model User {
   institution  String?
   phone        String?
   category     String?
+  email        String?
   isActive     Boolean       @default(true)
   attempts     ExamAttempt[]
+  emailLogs    EmailLog[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+}
+
+enum EmailStatus {
+  SENT
+  FAILED
+}
+
+model EmailLog {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    EmailStatus
+  resendId  String?
+  error     String?     @db.Text
+  createdAt DateTime    @default(now())
 }
 
 model QuestionCategory {
