@@ -23,6 +23,8 @@ interface SessionItem {
   isActive: boolean;
   shuffleQuestions: boolean;
   shuffleOptions: boolean;
+  startTime: string | null;
+  endTime: string | null;
   wrongPenalty: number;
   speedScoringMode: "BONUS_POINTS" | "TIE_BREAKER";
   maxSpeedBonus: number;
@@ -49,6 +51,18 @@ interface BankQuestion {
   category?: { name: string } | null;
 }
 
+// GELOMBANG 2: ubah ISO tersimpan (UTC) menjadi nilai datetime-local
+// dalam zona waktu browser admin, supaya jadwal yang tampil sama dengan
+// yang ia maksud. Pengiriman balik memakai toISOString() (lihat
+// handleSaveSession) sehingga server selalu menerima instant yang tepat.
+function toLocalInputValue(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function AdminSessionsPage() {
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [bankQuestions, setBankQuestions] = useState<BankQuestion[]>([]);
@@ -63,6 +77,9 @@ export default function AdminSessionsPage() {
   const [durationMinutes, setDurationMinutes] = useState(45);
   const [isActive, setIsActive] = useState(true);
   const [shuffleQuestions, setShuffleQuestions] = useState(true);
+  const [shuffleOptions, setShuffleOptions] = useState(false);
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [wrongPenalty, setWrongPenalty] = useState(0);
   const [speedScoringMode, setSpeedScoringMode] = useState<
     "BONUS_POINTS" | "TIE_BREAKER"
@@ -111,6 +128,9 @@ export default function AdminSessionsPage() {
     setDurationMinutes(45);
     setIsActive(true);
     setShuffleQuestions(true);
+    setShuffleOptions(false);
+    setStartTime("");
+    setEndTime("");
     setWrongPenalty(0);
     setSpeedScoringMode("BONUS_POINTS");
     setMaxSpeedBonus(20);
@@ -127,6 +147,9 @@ export default function AdminSessionsPage() {
     setDurationMinutes(s.durationMinutes);
     setIsActive(s.isActive);
     setShuffleQuestions(s.shuffleQuestions);
+    setShuffleOptions(s.shuffleOptions);
+    setStartTime(toLocalInputValue(s.startTime));
+    setEndTime(toLocalInputValue(s.endTime));
     setWrongPenalty(s.wrongPenalty);
     setSpeedScoringMode(s.speedScoringMode);
     setMaxSpeedBonus(s.maxSpeedBonus);
@@ -161,6 +184,13 @@ export default function AdminSessionsPage() {
           durationMinutes: Number(durationMinutes),
           isActive,
           shuffleQuestions,
+          shuffleOptions,
+          // Kirim sebagai ISO ber-offset (dari zona waktu browser admin),
+          // bukan string datetime-local mentah — kalau tidak, server
+          // akan menafsirkannya dalam zona waktu server (UTC) dan
+          // jendela bergeser 7 jam dari maksud admin.
+          startTime: startTime ? new Date(startTime).toISOString() : null,
+          endTime: endTime ? new Date(endTime).toISOString() : null,
           wrongPenalty: Number(wrongPenalty),
           speedScoringMode,
           maxSpeedBonus: Number(maxSpeedBonus),
@@ -401,6 +431,36 @@ export default function AdminSessionsPage() {
 
                 <div>
                   <label className="block text-xs font-bold text-zinc-700 mb-1">
+                    Jadwal Buka (Opsional)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-300 bg-white text-sm"
+                  />
+                  <p className="text-[11px] text-zinc-500 mt-1">
+                    Kosong = hanya tombol aktif yang berlaku.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
+                    Jadwal Tutup (Opsional)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-300 bg-white text-sm"
+                  />
+                  <p className="text-[11px] text-zinc-500 mt-1">
+                    Di luar jadwal ini peserta tidak bisa verifikasi/mulai.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Mode Penilaian Kecepatan
                   </label>
                   <select
@@ -458,6 +518,16 @@ export default function AdminSessionsPage() {
                     className="w-4 h-4 accent-zinc-700"
                   />
                   <span>Acak Urutan Soal per Peserta</span>
+                </label>
+
+                <label className="flex items-center gap-2 text-xs font-bold text-zinc-700 pt-5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={shuffleOptions}
+                    onChange={(e) => setShuffleOptions(e.target.checked)}
+                    className="w-4 h-4 accent-zinc-700"
+                  />
+                  <span>Acak Urutan Opsi Jawaban per Peserta</span>
                 </label>
 
                 <label className="flex items-center gap-2 text-xs font-bold text-zinc-800 pt-5 cursor-pointer">

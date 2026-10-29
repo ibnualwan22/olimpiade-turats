@@ -44,6 +44,25 @@ export async function POST(req: Request) {
       );
     }
 
+    // GELOMBANG 2: tegakkan jendela waktu bila diisi admin.
+    // isActive saja tidak cukup: ia bisa aktif terlalu awal untuk tes,
+    // atau lupa dimatikan sehingga peserta masih bisa masuk telat.
+    // (Peserta yang sudah mulai tidak ikut diblokir di sini — timer
+    // pribadi mereka tetap berlaku lewat expiresAt.)
+    const nowWindow = new Date();
+    if (examSession.startTime && nowWindow < examSession.startTime) {
+      return NextResponse.json(
+        { error: "Sesi ujian belum dibuka sesuai jadwal." },
+        { status: 403 }
+      );
+    }
+    if (examSession.endTime && nowWindow > examSession.endTime) {
+      return NextResponse.json(
+        { error: "Sesi ujian sudah ditutup sesuai jadwal." },
+        { status: 403 }
+      );
+    }
+
     if (examSession._count.questions === 0) {
       return NextResponse.json(
         { error: "Sesi ujian ini belum memiliki soal aktif." },

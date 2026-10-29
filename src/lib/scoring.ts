@@ -107,11 +107,20 @@ export async function calculateAndSaveAttemptScore(
         : "SUBMITTED"
       : attempt.status);
 
+  // GELOMBANG 2: untuk TIME_UP, "waktu selesai" adalah tenggat pribadi
+  // (expiresAt), bukan waktu admin/peserta kebetulan memicu finalisasi.
+  // Tanpa ini, semua TIME_UP yang difinalisasi bersamaan (mis. saat
+  // monitoring dibuka) akan punya finishedAt yang sama persis, sehingga
+  // tie-break "paling dulu selesai" menjadi ngawur.
+  const finishedAt =
+    attempt.finishedAt ??
+    (newStatus === "TIME_UP" ? (attempt.expiresAt ?? now) : now);
+
   const updated = await prisma.examAttempt.update({
     where: { id: attempt.id },
     data: {
       status: newStatus,
-      finishedAt: attempt.finishedAt ?? now,
+      finishedAt,
       timeSpentSeconds,
       rawScore: Number(rawScore.toFixed(2)),
       penaltyScore: Number(penaltyScore.toFixed(2)),

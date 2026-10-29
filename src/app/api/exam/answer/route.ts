@@ -28,6 +28,19 @@ export async function POST(req: Request) {
       );
     }
 
+    // GELOMBANG 1: tolak jawaban sebelum peserta klik "Mulai".
+    // Tanpa ini, attempt yang baru verifikasi token (startedAt null,
+    // expiresAt null) bisa dijawab sepuasnya tanpa timer berjalan.
+    if (!attempt.startedAt) {
+      return NextResponse.json(
+        {
+          error:
+            "Ujian belum dimulai. Klik 'Mulai' di halaman Tata Tertib terlebih dahulu.",
+        },
+        { status: 400 }
+      );
+    }
+
     const now = new Date();
     if (attempt.expiresAt && now > attempt.expiresAt) {
       await calculateAndSaveAttemptScore(attempt.id, "TIME_UP");

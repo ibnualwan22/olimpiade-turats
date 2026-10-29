@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
+// GELOMBANG 2: jendela waktu sesi (lihat sessions/route.ts).
+function parseOptionalDate(value: unknown): Date | null {
+  if (!value) return null;
+  const d = new Date(value as string);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -26,6 +33,8 @@ export async function PUT(
       wrongPenalty = 0,
       speedScoringMode = "BONUS_POINTS",
       maxSpeedBonus = 20,
+      startTime,
+      endTime,
       questionIds,
     } = body;
 
@@ -52,6 +61,15 @@ export async function PUT(
         speedScoringMode:
           speedScoringMode === "TIE_BREAKER" ? "TIE_BREAKER" : "BONUS_POINTS",
         maxSpeedBonus: Number(maxSpeedBonus) || 0,
+        // Hanya ubah jendela bila klien benar-benar mengirim kuncinya,
+        // supaya klien lama yang tidak mengenal kolom ini tidak ikut
+        // menghapus jendela yang sudah tersimpan.
+        ...("startTime" in body
+          ? { startTime: parseOptionalDate(startTime) }
+          : {}),
+        ...("endTime" in body
+          ? { endTime: parseOptionalDate(endTime) }
+          : {}),
         ...(Array.isArray(questionIds)
           ? {
             questions: {

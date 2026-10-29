@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
+// GELOMBANG 2: jendela waktu sesi. Nilai kosong/invalid = null (tidak
+// dibatasi jendela, hanya isActive yang berlaku). Form admin mengirim
+// ISO dengan offset zona waktu, jadi new Date() di sini sudah tepat.
+function parseOptionalDate(value: unknown): Date | null {
+  if (!value) return null;
+  const d = new Date(value as string);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 export async function GET() {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") {
@@ -54,6 +63,8 @@ export async function POST(req: Request) {
       wrongPenalty = 0,
       speedScoringMode = "BONUS_POINTS",
       maxSpeedBonus = 20,
+      startTime,
+      endTime,
       questionIds = [],
     } = body;
 
@@ -92,6 +103,8 @@ export async function POST(req: Request) {
         speedScoringMode:
           speedScoringMode === "TIE_BREAKER" ? "TIE_BREAKER" : "BONUS_POINTS",
         maxSpeedBonus: Number(maxSpeedBonus) || 0,
+        startTime: parseOptionalDate(startTime),
+        endTime: parseOptionalDate(endTime),
         questions: {
           create: (questionIds as string[]).map((qId, idx) => ({
             questionId: qId,

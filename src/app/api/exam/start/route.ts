@@ -36,6 +36,22 @@ export async function POST(req: Request) {
       );
     }
 
+    // GELOMBANG 2: tegakkan jendela waktu bila diisi admin
+    // (cerminan cek di verify-token).
+    const nowWindow = new Date();
+    if (examSession.startTime && nowWindow < examSession.startTime) {
+      return NextResponse.json(
+        { error: "Sesi ujian belum dibuka sesuai jadwal." },
+        { status: 403 }
+      );
+    }
+    if (examSession.endTime && nowWindow > examSession.endTime) {
+      return NextResponse.json(
+        { error: "Sesi ujian sudah ditutup sesuai jadwal." },
+        { status: 403 }
+      );
+    }
+
     const attempt = await prisma.examAttempt.findUnique({
       where: {
         userId_sessionId: {

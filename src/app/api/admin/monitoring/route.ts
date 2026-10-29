@@ -77,8 +77,13 @@ export async function GET(req: Request) {
         select: { answers: true },
       },
     },
+    // GELOMBANG 2: penentu seri sesuai aturan yang diiklankan —
+    // nilai tertinggi, lalu paling dulu selesai (finishedAt), lalu
+    // durasi tercepat; tokenVerifiedAt hanya penentu terakhir supaya
+    // urutan deterministik.
     orderBy: [
       { finalScore: "desc" },
+      { finishedAt: "asc" },
       { timeSpentSeconds: "asc" },
       { tokenVerifiedAt: "asc" },
     ],

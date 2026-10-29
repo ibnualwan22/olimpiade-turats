@@ -1,9 +1,17 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || "olimpiade-turats-super-secret-jwt-key-2026"
-);
+// GELOMBANG 2: tidak ada lagi secret cadangan hardcode. Dulu, bila
+// JWT_SECRET kosong, siapa pun yang membaca repo bisa menempa token
+// ADMIN. Sekarang secret wajib ada: kalau tidak, login gagal total
+// (fail closed) dan verifikasi sesi mengembalikan null.
+function getSecretKey(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET tidak diset di environment");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 export const COOKIE_NAME = "turats_session";
 
@@ -20,12 +28,12 @@ export async function signToken(payload: SessionPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("24h")
-    .sign(SECRET_KEY);
+    .sign(getSecretKey());
 }
 
 export async function verifyToken(token: string): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET_KEY);
+    const { payload } = await jwtVerify(token, getSecretKey());
     return payload as unknown as SessionPayload;
   } catch {
     return null;

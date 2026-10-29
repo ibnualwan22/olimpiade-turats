@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signToken, COOKIE_NAME } from "@/lib/auth";
+import {
+  getClientIp,
+  isLoginRateLimited,
+  recordLoginFailure,
+} from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
   try {
@@ -15,11 +20,26 @@ export async function POST(req: Request) {
       );
     }
 
+    // GELOMBANG 2: batasi percobaan login gagal per IP (20 per 15 menit).
+    // Pesan kegagalan tetap sama untuk semua kasus supaya tidak bisa
+    // dipakai menebak username mana yang terdaftar.
+    const clientIp = getClientIp(req);
+    if (isLoginRateLimited(clientIp)) {
+      return NextResponse.json(
+        {
+          error:
+            "Terlalu banyak percobaan login gagal dari jaringan ini. Coba lagi dalam 15 menit.",
+        },
+        { status: 429 }
+      );
+    }
+
     const user = await prisma.user.findUnique({
       where: { username: username.trim() },
     });
 
     if (!user) {
+      recordLoginFailure(clientIp);
       return NextResponse.json(
         { error: "Username atau password salah" },
         { status: 401 }
@@ -27,6 +47,7 @@ export async function POST(req: Request) {
     }
 
     if (!user.isActive) {
+      recordLoginFailure(clientIp);
       return NextResponse.json(
         { error: "Akun Anda sedang dinonaktifkan oleh panitia" },
         { status: 403 }
@@ -35,6 +56,7 @@ export async function POST(req: Request) {
 
     const isValid = await bcrypt.compare(password, user.passwordHash);
     if (!isValid) {
+      recordLoginFailure(clientIp);
       return NextResponse.json(
         { error: "Username atau password salah" },
         { status: 401 }
