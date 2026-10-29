@@ -9,6 +9,10 @@ import {
   Trophy,
   ArrowRight,
   CheckCircle2,
+  LogIn,
+  ShieldCheck,
+  Clock,
+  Award,
 } from "lucide-react";
 
 // Halaman ini membaca cookie sesi lalu redirect, jadi tidak bisa di-prerender.
@@ -17,61 +21,79 @@ export const instant = false;
 
 const FIELDS = [
   {
+    code: "01",
     name: "Nahwu",
+    level: "Ulya & Wustha",
     arabic: "النَّحْوُ",
-    desc: "Kaidah i'rab, marfu'at, manshubat, dan syarah Alfiyah Ibnu Malik.",
+    desc: "Kaidah i'rab, marfu'at, manshubat, serta syarah Alfiyah Ibnu Malik dan Jurumiyah.",
   },
   {
+    code: "02",
     name: "Sharaf",
+    level: "Ulya & Wustha",
     arabic: "الصَّرْفُ",
-    desc: "Tasrif dan pembentukan kata dalam bahasa Arab.",
+    desc: "Tasrif istilahi dan lughawi, bina', i'lal, serta pembentukan kata bahasa Arab.",
   },
   {
+    code: "03",
     name: "Fiqih",
+    level: "Ulya & Wustha",
     arabic: "الْفِقْهُ",
-    desc: "Ketentuan ibadah dan muamalah dari kitab-kitab fikih.",
+    desc: "Ketentuan thaharah, ibadah, dan muamalah berdasarkan kitab-kitab fikih mu'tabarah.",
   },
   {
+    code: "04",
     name: "Balaghah",
+    level: "Ulya & Wustha",
     arabic: "الْبَلَاغَةُ",
-    desc: "Keindahan dan ketepatan berbahasa Arab.",
+    desc: "Ilmu ma'ani, bayan, dan badi' untuk ketepatan serta keindahan sastra Arab.",
   },
 ];
 
 const STEPS = [
   {
     no: "01",
-    title: "Login & Token",
-    desc: "Masuk dengan akun peserta, lalu masukkan token sesi yang diberikan panitia.",
+    title: "Login Peserta & Token Sesi",
+    desc: "Klik tombol Login Peserta, masuk menggunakan akun resmi, lalu verifikasi token sesi aktif dari panitia.",
   },
   {
     no: "02",
-    title: "Baca Tata Tertib",
-    desc: "Pahami aturan bobot soal, durasi, dan tata tertib sebelum menekan tombol mulai.",
+    title: "Verifikasi Tata Tertib",
+    desc: "Periksa durasi sesi, jumlah soal, serta aturan bobot dan penalti sebelum memulai ujian.",
   },
   {
     no: "03",
-    title: "Kerjakan & Dinilai",
-    desc: "Jawaban tepat menambah skor, dan kecepatan pengerjaan memberikan nilai tambah.",
+    title: "Kerjakan Ujian & Raih Skor",
+    desc: "Jawab soal pilihan ganda berbahasa Arab dengan tepat dan cepat untuk memperoleh Speed Bonus.",
   },
 ];
 
 const SCORING = [
   {
     icon: BookMarked,
-    title: "Bobot per Soal",
-    desc: "Setiap soal memiliki bobot poin yang diatur panitia pada tiap sesi.",
+    metric: "+Poin Bobot",
+    title: "Bobot Poin Terukur",
+    desc: "Setiap butir soal memiliki bobot nilai yang dikonfigurasi secara transparan pada tiap sesi ujian.",
   },
   {
     icon: Timer,
-    title: "Penalti Jawaban Salah",
-    desc: "Sistem minus dapat diaktifkan per sesi sebagai penalti jawaban yang salah.",
+    metric: "Server-Side",
+    title: "Kontrol Waktu & Penalti",
+    desc: "Hitung mundur berjalan di server untuk menjamin keadilan waktu, disertai opsi penalti jawaban salah.",
   },
   {
     icon: Trophy,
+    metric: "+Speed Bonus",
     title: "Bonus Kecepatan",
-    desc: "Menyelesaikan ujian lebih cepat dengan jawaban tepat memberikan nilai tambah.",
+    desc: "Peserta yang menyelesaikan ujian lebih cepat dengan akurasi tinggi memperoleh poin bonus tambahan.",
   },
+];
+
+const STATS = [
+  { label: "Bidang Kitab", value: "4 Cabang" },
+  { label: "Jenjang Kompetisi", value: "Ulya & Wustha" },
+  { label: "Sinkronisasi Waktu", value: "100% Server" },
+  { label: "Standar Aksesibilitas", value: "WCAG 2.2 AA" },
 ];
 
 export default async function HomePage() {
@@ -84,223 +106,493 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex flex-col">
-      {/* Navigasi */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-zinc-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="w-9 h-9 rounded-lg bg-zinc-900 text-amber-400 flex items-center justify-center">
-              <BookOpen className="w-5 h-5" />
+    <div className="font-design-system min-h-screen bg-[var(--color-surface-base)] text-[var(--color-text-tertiary)] flex flex-col selection:bg-[var(--color-surface-strong)] selection:text-[var(--color-surface-base)]">
+      {/* Skip Link untuk aksesibilitas keyboard (WCAG 2.2 AA) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-[var(--space-1)] focus:py-3 focus:rounded-md focus:bg-[var(--color-surface-strong)] focus:text-[var(--color-surface-base)] focus:font-bold focus:outline-2 focus:outline-offset-2 focus:outline-[var(--color-text-tertiary)]"
+      >
+        Lewati ke konten utama
+      </a>
+
+      {/* Top Utility Bar (Consulotion Style) */}
+      <div className="bg-[var(--color-surface-raised)] border-b border-[var(--color-border-muted)]">
+        <div className="max-w-6xl mx-auto px-[var(--space-1)] py-2.5 flex flex-wrap items-center justify-between gap-3 text-base">
+          <div className="flex items-center gap-2 text-[var(--color-text-secondary)]">
+            <span
+              className="inline-block w-2.5 h-2.5 rounded-full bg-[var(--color-surface-strong)]"
+              aria-hidden="true"
+            />
+            <span>
+              Portal Resmi CBT Kitab Kuning &bull; Olimpiade Turats 2026
             </span>
-            <span className="leading-tight">
-              <span className="block font-bold tracking-tight">
-                Olimpiade Turats
+          </div>
+          <div className="hidden sm:flex items-center gap-[var(--space-1)] text-[var(--color-text-secondary)]">
+            <span className="flex items-center gap-1.5">
+              <Clock
+                className="w-4 h-4 text-[var(--color-surface-strong)]"
+                aria-hidden="true"
+              />
+              Server Time Sync Aktif
+            </span>
+            <span aria-hidden="true">|</span>
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck
+                className="w-4 h-4 text-[var(--color-surface-strong)]"
+                aria-hidden="true"
+              />
+              Sistem Token Terenkripsi
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Primary Navigation (Navigation 1 of 2 per DESIGN.md) */}
+      <header className="sticky top-0 z-40 bg-[var(--color-surface-base)]/95 backdrop-blur border-b border-[var(--color-border-muted)]">
+        <div className="max-w-6xl mx-auto px-[var(--space-1)] min-h-[76px] flex items-center justify-between gap-[var(--space-1)]">
+          <Link
+            href="/"
+            className="flex items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)] transition duration-[200ms]"
+          >
+            <span className="w-11 h-11 rounded-md bg-[var(--color-surface-strong)] text-[var(--color-surface-base)] flex items-center justify-center shrink-0">
+              <BookOpen className="w-6 h-6" aria-hidden="true" />
+            </span>
+            <span>
+              <span className="block font-extrabold tracking-tight text-[var(--color-text-tertiary)] text-lg leading-tight">
+                OLIMPIADE TURATS
               </span>
-              <span className="block text-xs text-zinc-500">
-                CBT Kitab Kuning
+              <span className="block text-base text-[var(--color-text-secondary)] leading-tight">
+                CBT Kitab Kuning Nasional
               </span>
             </span>
           </Link>
-          <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-zinc-600">
-            <a href="#bidang" className="hover:text-zinc-900">
-              Bidang
+
+          <nav
+            aria-label="Navigasi Utama"
+            className="hidden md:flex items-center gap-[var(--space-2)] text-base font-medium"
+          >
+            <a
+              href="#bidang"
+              className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)] active:text-[var(--color-surface-strong)] rounded-sm py-1 transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              Bidang Uji
             </a>
-            <a href="#alur" className="hover:text-zinc-900">
-              Alur
+            <a
+              href="#alur"
+              className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)] active:text-[var(--color-surface-strong)] rounded-sm py-1 transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              Alur Pelaksanaan
             </a>
-            <a href="#penilaian" className="hover:text-zinc-900">
-              Penilaian
+            <a
+              href="#penilaian"
+              className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)] active:text-[var(--color-surface-strong)] rounded-sm py-1 transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              Sistem Penilaian
             </a>
           </nav>
+
           <Link
             href="/login"
-            className="px-4 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-sm transition"
+            className="inline-flex items-center justify-center gap-2 px-[var(--space-1)] py-2.5 rounded-md bg-[var(--color-surface-strong)] hover:bg-[var(--color-surface-strong-hover)] active:bg-[var(--color-surface-strong-active)] text-[var(--color-surface-base)] font-bold text-base transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-tertiary)]"
           >
-            Masuk
+            <LogIn className="w-4 h-4" aria-hidden="true" />
+            <span>Login Peserta</span>
           </Link>
         </div>
       </header>
 
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="bg-zinc-900 text-white border-t-2 border-amber-400">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-            <p className="text-xs font-bold uppercase tracking-widest text-amber-400">
-              Computer-Based Test &bull; Olimpiade Turats 2026
-            </p>
-            <p
-              dir="rtl"
-              className="font-arabic text-2xl sm:text-3xl text-amber-300/90 mt-6"
-            >
-              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-            </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight mt-4">
-              Olimpiade Turats
-            </h1>
-            <p className="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-2xl mt-4">
-              Kompetisi dan ujian berbasis komputer untuk kitab kuning —
-              Nahwu, Sharaf, Fiqih, dan Balaghah — dengan sistem token sesi,
-              hitung mundur waktu server, dan penilaian kecepatan pengerjaan.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 mt-8">
-              <Link
-                href="/login"
-                className="px-6 py-3.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-sm flex items-center justify-center gap-2 transition"
-              >
-                Masuk ke Portal
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href="#alur"
-                className="px-6 py-3.5 rounded-lg border border-zinc-700 hover:border-zinc-500 text-white font-semibold text-sm flex items-center justify-center transition"
-              >
-                Lihat Alur Ujian
-              </a>
+      <main id="main-content" className="flex-1">
+        {/* Hero Section */}
+        <section
+          aria-labelledby="hero-heading"
+          className="relative bg-[var(--color-surface-base)] border-b border-[var(--color-border-muted)]"
+        >
+          <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)] lg:py-20">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-[var(--space-2)] items-center">
+              {/* Left Column: Core Hero Content & "Login Peserta" Button */}
+              <div className="lg:col-span-7">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[var(--color-surface-raised)] border border-[var(--color-border-muted)] text-[var(--color-surface-strong)] font-semibold text-base">
+                  <Award className="w-4 h-4 shrink-0" aria-hidden="true" />
+                  <span>Computer-Based Test (CBT) &bull; Edisi 2026</span>
+                </div>
+
+                <p
+                  dir="rtl"
+                  lang="ar"
+                  className="font-arabic text-2xl sm:text-3xl text-[var(--color-surface-strong)] mt-[var(--space-1)]"
+                >
+                  بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                </p>
+
+                <h1
+                  id="hero-heading"
+                  className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--color-text-tertiary)] leading-tight mt-3"
+                >
+                  Kompetisi &amp; Ujian{" "}
+                  <span className="text-[var(--color-surface-strong)]">
+                    Olimpiade Turats
+                  </span>
+                </h1>
+
+                <p className="text-base sm:text-lg text-[var(--color-text-secondary)] leading-relaxed max-w-2xl mt-[var(--space-1)]">
+                  Platform evaluasi kitab kuning terstandarisasi untuk bidang{" "}
+                  <strong className="text-[var(--color-text-tertiary)] font-semibold">
+                    Nahwu, Sharaf, Fiqih, dan Balaghah
+                  </strong>
+                  . Dilengkapi validasi token sesi, sinkronisasi waktu server
+                  secara real-time, dan kalkulasi nilai berbasis ketepatan serta
+                  kecepatan pengerjaan.
+                </p>
+
+                {/* Primary Hero CTA: Tombol Login Peserta */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-[var(--space-1)] mt-[var(--space-2)]">
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-md bg-[var(--color-surface-strong)] hover:bg-[var(--color-surface-strong-hover)] active:bg-[var(--color-surface-strong-active)] text-[var(--color-surface-base)] font-extrabold text-base tracking-wide shadow-lg transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-text-tertiary)]"
+                  >
+                    <LogIn className="w-5 h-5 shrink-0" aria-hidden="true" />
+                    <span>Login Peserta</span>
+                    <ArrowRight
+                      className="w-5 h-5 shrink-0"
+                      aria-hidden="true"
+                    />
+                  </Link>
+
+                  <a
+                    href="#alur"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-md bg-[var(--color-surface-raised)] hover:bg-[var(--color-surface-muted)]/40 active:bg-[var(--color-surface-raised)] border border-[var(--color-border-subtle)] text-[var(--color-text-tertiary)] font-semibold text-base transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+                  >
+                    <span>Lihat Panduan &amp; Alur Ujian</span>
+                  </a>
+                </div>
+
+                {/* Quick Trust Indicators */}
+                <div className="mt-[var(--space-2)] pt-[var(--space-1)] border-t border-[var(--color-border-muted)] grid grid-cols-2 sm:grid-cols-4 gap-[var(--space-1)]">
+                  {STATS.map((item) => (
+                    <div key={item.label}>
+                      <div className="text-lg font-extrabold text-[var(--color-text-tertiary)]">
+                        {item.value}
+                      </div>
+                      <div className="text-base text-[var(--color-text-secondary)]">
+                        {item.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Consulotion Structured Status Panel */}
+              <div className="lg:col-span-5">
+                <div className="rounded-md bg-[var(--color-surface-raised)] border border-[var(--color-border-subtle)] p-[var(--space-1)] sm:p-[var(--space-2)]">
+                  <div className="flex items-center justify-between pb-[var(--space-1)] border-b border-[var(--color-border-muted)]">
+                    <div>
+                      <span className="text-base font-bold uppercase tracking-wider text-[var(--color-surface-strong)] block">
+                        Akses Ruang Ujian
+                      </span>
+                      <h2 className="text-xl font-extrabold text-[var(--color-text-tertiary)] mt-1">
+                        Kesiapan Sesi Peserta
+                      </h2>
+                    </div>
+                    <span className="px-3 py-1 rounded-md bg-[var(--color-surface-base)] border border-[var(--color-surface-strong)] text-[var(--color-surface-strong)] font-bold text-base">
+                      Aktif
+                    </span>
+                  </div>
+
+                  <ul className="space-y-4 my-[var(--space-1)]">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2
+                        className="w-5 h-5 text-[var(--color-surface-strong)] shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
+                      <div>
+                        <div className="font-bold text-[var(--color-text-tertiary)] text-base">
+                          Akun Peserta Terdaftar
+                        </div>
+                        <p className="text-base text-[var(--color-text-secondary)]">
+                          Gunakan username dan kata sandi yang diterbitkan oleh
+                          panitia olimpiade.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <KeyRound
+                        className="w-5 h-5 text-[var(--color-surface-strong)] shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
+                      <div>
+                        <div className="font-bold text-[var(--color-text-tertiary)] text-base">
+                          Token Sesi Perlombaan
+                        </div>
+                        <p className="text-base text-[var(--color-text-secondary)]">
+                          Token dimasukkan setelah berhasil login untuk membuka
+                          soal sesuai gelombang.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Timer
+                        className="w-5 h-5 text-[var(--color-surface-strong)] shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
+                      <div>
+                        <div className="font-bold text-[var(--color-text-tertiary)] text-base">
+                          Penyimpanan Jawaban Otomatis
+                        </div>
+                        <p className="text-base text-[var(--color-text-secondary)]">
+                          Setiap jawaban langsung tersimpan ke server tanpa
+                          risiko hilang saat koneksi terputus.
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+
+                  <div className="pt-[var(--space-1)] border-t border-[var(--color-border-muted)]">
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center gap-2 px-[var(--space-1)] py-3.5 rounded-md bg-[var(--color-surface-strong)] hover:bg-[var(--color-surface-strong-hover)] active:bg-[var(--color-surface-strong-active)] text-[var(--color-surface-base)] font-extrabold text-base transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-tertiary)]"
+                    >
+                      <LogIn className="w-5 h-5" aria-hidden="true" />
+                      <span>Login Peserta Sekarang</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Bidang */}
-        <section id="bidang" className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
-          <p className="text-xs font-bold uppercase tracking-widest text-amber-600">
-            Bidang yang Diujikan
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">
-            Empat bidang ilmu alat dan syariah
-          </h2>
-          <p className="text-sm sm:text-base text-zinc-500 mt-2 max-w-2xl">
-            Soal pilihan ganda berbahasa Arab, dalam dua jenjang: Ulya
-            (Tingkat Atas) dan Wustha (Tingkat Menengah).
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-            {FIELDS.map((f) => (
-              <div
-                key={f.name}
-                className="rounded-xl border border-zinc-200 bg-white p-5 hover:border-amber-400 transition"
+        {/* Bidang yang Diujikan */}
+        <section
+          id="bidang"
+          aria-labelledby="bidang-heading"
+          className="bg-[var(--color-surface-base)] border-b border-[var(--color-border-muted)]"
+        >
+          <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)] lg:py-16">
+            <div className="max-w-2xl">
+              <p className="text-base font-bold uppercase tracking-widest text-[var(--color-surface-strong)]">
+                Bidang yang Diujikan
+              </p>
+              <h2
+                id="bidang-heading"
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-tertiary)] mt-2"
               >
-                <p dir="rtl" className="font-arabic text-2xl text-amber-600">
-                  {f.arabic}
-                </p>
-                <h3 className="font-bold mt-3">{f.name}</h3>
-                <p className="text-sm text-zinc-500 leading-relaxed mt-1">
-                  {f.desc}
-                </p>
-              </div>
-            ))}
+                Empat Disiplin Ilmu Alat &amp; Syariah
+              </h2>
+              <p className="text-base text-[var(--color-text-secondary)] mt-2">
+                Seluruh naskah soal disajikan dalam teks Arab berharakat lengkap
+                untuk menguji ketajaman analisis gramatikal dan pemahaman matan
+                kitab kuning.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[var(--space-1)] mt-[var(--space-2)]">
+              {FIELDS.map((f) => (
+                <article
+                  key={f.name}
+                  className="rounded-md bg-[var(--color-surface-raised)] border border-[var(--color-border-muted)] hover:border-[var(--color-surface-strong)] p-[var(--space-1)] flex flex-col justify-between transition duration-[200ms]"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 pb-3 border-b border-[var(--color-border-muted)]">
+                      <span className="text-base font-bold text-[var(--color-surface-strong)]">
+                        {f.code} &bull; {f.level}
+                      </span>
+                      <span
+                        dir="rtl"
+                        lang="ar"
+                        className="font-arabic text-2xl text-[var(--color-text-tertiary)]"
+                      >
+                        {f.arabic}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-[var(--color-text-tertiary)] mt-[var(--space-1)]">
+                      {f.name}
+                    </h3>
+                    <p className="text-base text-[var(--color-text-secondary)] leading-relaxed mt-2">
+                      {f.desc}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* Alur */}
-        <section id="alur" className="bg-zinc-50 border-y border-zinc-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
-            <p className="text-xs font-bold uppercase tracking-widest text-amber-600">
-              Alur Mengikuti
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">
-              Tiga langkah menuju ruang ujian
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+        {/* Alur Mengikuti Ujian */}
+        <section
+          id="alur"
+          aria-labelledby="alur-heading"
+          className="bg-[var(--color-surface-raised)] border-b border-[var(--color-border-muted)]"
+        >
+          <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)] lg:py-16">
+            <div className="max-w-2xl">
+              <p className="text-base font-bold uppercase tracking-widest text-[var(--color-surface-strong)]">
+                Alur Pelaksanaan
+              </p>
+              <h2
+                id="alur-heading"
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-tertiary)] mt-2"
+              >
+                Tiga Tahap Menuju Ruang Ujian
+              </h2>
+              <p className="text-base text-[var(--color-text-secondary)] mt-2">
+                Prosedur terstruktur bagi seluruh peserta agar pelaksanaan ujian
+                berjalan tertib, objektif, dan bebas kendala teknis.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--space-1)] mt-[var(--space-2)]">
               {STEPS.map((s) => (
                 <div
                   key={s.no}
-                  className="rounded-xl border border-zinc-200 bg-white p-5"
+                  className="rounded-md bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] p-[var(--space-1)]"
                 >
-                  <div className="text-2xl font-black text-amber-500">
-                    {s.no}
+                  <div className="inline-flex items-center justify-center px-3 py-1 rounded-md bg-[var(--color-surface-strong)] text-[var(--color-surface-base)] font-extrabold text-base">
+                    Tahap {s.no}
                   </div>
-                  <h3 className="font-bold mt-2 flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-[var(--color-text-tertiary)] mt-[var(--space-1)]">
                     {s.title}
                   </h3>
-                  <p className="text-sm text-zinc-500 leading-relaxed mt-1">
+                  <p className="text-base text-[var(--color-text-secondary)] leading-relaxed mt-2">
                     {s.desc}
                   </p>
                 </div>
               ))}
             </div>
-            <p className="text-sm text-zinc-500 mt-6 flex items-start gap-2">
-              <KeyRound className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              Token sesi dibagikan oleh panitia dan hanya berlaku untuk sesi
-              yang sedang aktif.
-            </p>
+
+            <div className="mt-[var(--space-2)] p-[var(--space-1)] rounded-md bg-[var(--color-surface-base)] border border-[var(--color-border-muted)] flex flex-col sm:flex-row sm:items-center justify-between gap-[var(--space-1)]">
+              <p className="text-base text-[var(--color-text-secondary)] flex items-start sm:items-center gap-3">
+                <KeyRound
+                  className="w-5 h-5 text-[var(--color-surface-strong)] shrink-0 mt-0.5 sm:mt-0"
+                  aria-hidden="true"
+                />
+                <span>
+                  Token sesi diumumkan langsung oleh pengawas ruangan saat
+                  jadwal ujian dimulai.
+                </span>
+              </p>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-2 px-[var(--space-1)] py-2.5 rounded-md bg-[var(--color-surface-strong)] hover:bg-[var(--color-surface-strong-hover)] active:bg-[var(--color-surface-strong-active)] text-[var(--color-surface-base)] font-bold text-base shrink-0 transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-text-tertiary)]"
+              >
+                <LogIn className="w-4 h-4" aria-hidden="true" />
+                <span>Login Peserta</span>
+              </Link>
+            </div>
           </div>
         </section>
 
-        {/* Penilaian */}
+        {/* Sistem Penilaian */}
         <section
           id="penilaian"
-          className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16"
+          aria-labelledby="penilaian-heading"
+          className="bg-[var(--color-surface-base)] border-b border-[var(--color-border-muted)]"
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-amber-600">
-            Sistem Penilaian
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">
-            Nilai akhir yang transparan
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-            {SCORING.map((s) => {
-              const Icon = s.icon;
-              return (
-                <div
-                  key={s.title}
-                  className="rounded-xl border border-zinc-200 bg-white p-5"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center">
-                    <Icon className="w-5 h-5" />
+          <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)] lg:py-16">
+            <div className="max-w-2xl">
+              <p className="text-base font-bold uppercase tracking-widest text-[var(--color-surface-strong)]">
+                Metodologi Evaluasi
+              </p>
+              <h2
+                id="penilaian-heading"
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-tertiary)] mt-2"
+              >
+                Sistem Penilaian Transparan &amp; Akurat
+              </h2>
+              <p className="text-base text-[var(--color-text-secondary)] mt-2">
+                Nilai akhir dihitung secara otomatis oleh sistem berdasarkan
+                kombinasi ketepatan jawaban dan efisiensi waktu pengerjaan.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-[var(--space-1)] mt-[var(--space-2)]">
+              {SCORING.map((s) => {
+                const Icon = s.icon;
+                return (
+                  <div
+                    key={s.title}
+                    className="rounded-md bg-[var(--color-surface-raised)] border border-[var(--color-border-muted)] p-[var(--space-1)]"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="w-11 h-11 rounded-md bg-[var(--color-surface-base)] border border-[var(--color-border-subtle)] text-[var(--color-surface-strong)] flex items-center justify-center">
+                        <Icon className="w-5 h-5" aria-hidden="true" />
+                      </span>
+                      <span className="px-3 py-1 rounded-md bg-[var(--color-surface-base)] text-[var(--color-surface-strong)] font-bold text-base">
+                        {s.metric}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-[var(--color-text-tertiary)] mt-[var(--space-1)]">
+                      {s.title}
+                    </h3>
+                    <p className="text-base text-[var(--color-text-secondary)] leading-relaxed mt-2">
+                      {s.desc}
+                    </p>
                   </div>
-                  <h3 className="font-bold mt-3">{s.title}</h3>
-                  <p className="text-sm text-zinc-500 leading-relaxed mt-1">
-                    {s.desc}
-                  </p>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-          <ul className="mt-6 space-y-2 text-sm text-zinc-600">
-            <li className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              Waktu pengerjaan dihitung dari server, bukan dari perangkat
-              peserta.
-            </li>
-            <li className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              Jawaban tersimpan otomatis selama ujian berlangsung.
-            </li>
-          </ul>
         </section>
 
-        {/* CTA penutup */}
-        <section className="bg-zinc-900 text-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        {/* Bottom CTA Section */}
+        <section
+          aria-labelledby="cta-heading"
+          className="bg-[var(--color-surface-raised)] border-b border-[var(--color-border-muted)]"
+        >
+          <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-2)] flex flex-col md:flex-row md:items-center justify-between gap-[var(--space-1)]">
             <div>
-              <h2 className="text-2xl font-extrabold tracking-tight">
-                Siap mengikuti olimpiade?
+              <h2
+                id="cta-heading"
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-tertiary)]"
+              >
+                Siap Mengikuti Olimpiade Turats?
               </h2>
-              <p className="text-sm text-zinc-400 mt-1">
-                Masuk dengan akun peserta dan token sesi dari panitia.
+              <p className="text-base text-[var(--color-text-secondary)] mt-1">
+                Masuk ke portal ujian menggunakan akun peserta Anda dan masukkan
+                token sesi yang sedang berlangsung.
               </p>
             </div>
             <Link
               href="/login"
-              className="px-6 py-3.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-sm flex items-center justify-center gap-2 transition shrink-0"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-md bg-[var(--color-surface-strong)] hover:bg-[var(--color-surface-strong-hover)] active:bg-[var(--color-surface-strong-active)] text-[var(--color-surface-base)] font-extrabold text-base shrink-0 transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-text-tertiary)]"
             >
-              Masuk ke Portal
-              <ArrowRight className="w-4 h-4" />
+              <LogIn className="w-5 h-5" aria-hidden="true" />
+              <span>Login Peserta</span>
+              <ArrowRight className="w-5 h-5" aria-hidden="true" />
             </Link>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-zinc-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <p className="text-sm text-zinc-500">
-            Olimpiade Turats — Sistem Ujian &amp; Kompetisi Kitab Kuning (CBT)
+      {/* Footer Navigation (Navigation 2 of 2 per DESIGN.md) */}
+      <footer className="bg-[var(--color-surface-base)]">
+        <div className="max-w-6xl mx-auto px-[var(--space-1)] py-[var(--space-1)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-[var(--space-1)]">
+          <p className="text-base text-[var(--color-text-secondary)]">
+            &copy; 2026 Olimpiade Turats &mdash; Sistem Ujian &amp; Kompetisi
+            Kitab Kuning (CBT)
           </p>
-          <Link
-            href="/login"
-            className="text-sm font-semibold text-amber-700 hover:text-amber-600"
+          <nav
+            aria-label="Navigasi Footer"
+            className="flex items-center gap-[var(--space-1)] text-base"
           >
-            Masuk
-          </Link>
+            <a
+              href="#bidang"
+              className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)] rounded-sm transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              Bidang
+            </a>
+            <a
+              href="#alur"
+              className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-tertiary)] rounded-sm transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              Alur
+            </a>
+            <Link
+              href="/login"
+              className="font-bold text-[var(--color-surface-strong)] hover:underline rounded-sm transition duration-[200ms] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-surface-strong)]"
+            >
+              Login Peserta
+            </Link>
+          </nav>
         </div>
       </footer>
     </div>

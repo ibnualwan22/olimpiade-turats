@@ -3,6 +3,23 @@
 :root {
   --background: #fafafa;
   --foreground: #18181b;
+
+  /* DESIGN.md — Consulotion Semantic Tokens */
+  --color-surface-base: #000000;
+  --color-surface-raised: #333333;
+  --color-surface-muted: #727272;
+  --color-surface-strong: #7ac64d;
+  --color-surface-strong-hover: #8bd45e;
+  --color-surface-strong-active: #66ad3b;
+  --color-text-secondary: #9b9b9b;
+  --color-text-tertiary: #ffffff;
+  --color-border-muted: #444444;
+  --color-border-subtle: #9b9b9b;
+  --space-1: 20px;
+  --space-2: 40px;
+  --motion-duration-instant: 200ms;
+  --font-system-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 
 @theme inline {
@@ -16,6 +33,16 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-jakarta), sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.font-design-system {
+  font-family: var(--font-system-stack);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
 }
 
 .font-arabic {
@@ -24,6 +51,6 @@ body {
 }
 
 ::selection {
-  background: #fbbf24;
-  color: #09090b;
+  background: var(--color-surface-strong);
+  color: var(--color-surface-base);
 }
