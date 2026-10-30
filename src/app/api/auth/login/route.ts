@@ -7,11 +7,12 @@ import {
   isLoginRateLimited,
   recordLoginFailure,
 } from "@/lib/rateLimit";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { username, password } = body;
+    const { username, password, turnstileToken } = body;
 
     if (!username || !password) {
       return NextResponse.json(
@@ -31,6 +32,18 @@ export async function POST(req: Request) {
             "Terlalu banyak percobaan login gagal dari jaringan ini. Coba lagi dalam 15 menit.",
         },
         { status: 429 }
+      );
+    }
+
+    // Turnstile: token diverifikasi server-side SEBELUM memeriksa
+    // kredensial, supaya bot tidak bisa membanjiri percobaan login.
+    // Kegagalan verifikasi ikut dihitung sebagai percobaan gagal.
+    const turnstile = await verifyTurnstileToken(turnstileToken);
+    if (!turnstile.ok) {
+      recordLoginFailure(clientIp);
+      return NextResponse.json(
+        { error: turnstile.error || "Verifikasi keamanan gagal." },
+        { status: 400 }
       );
     }
 

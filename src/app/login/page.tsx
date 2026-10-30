@@ -1,8 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookOpen, KeyRound, User, ArrowRight } from "lucide-react";
+
+type TurnstileApi = {
+  render: (
+    el: HTMLElement,
+    opts: {
+      sitekey: string;
+      callback: (token: string) => void;
+      "expired-callback": () => void;
+      "error-callback": () => void;
+    }
+  ) => string;
+  reset: (widgetId?: string) => void;
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,6 +23,62 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+
+  // Site key tertanam saat build (NEXT_PUBLIC_). Tanpa ini widget tidak
+  // dirender dan server akan menolak login dengan pesan yang jelas.
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+
+  // Muat skrip Turnstile sekali, lalu render widget secara eksplisit.
+  // Token hanya berlaku sekali: setiap login gagal me-reset widget
+  // supaya percobaan berikutnya mendapat token baru.
+  useEffect(() => {
+    if (!siteKey) return;
+    const renderWidget = () => {
+      const turnstile = (window as unknown as { turnstile?: TurnstileApi })
+        .turnstile;
+      if (
+        turnstile &&
+        widgetRef.current &&
+        !widgetRef.current.hasChildNodes()
+      ) {
+        widgetIdRef.current = turnstile.render(widgetRef.current, {
+          sitekey: siteKey,
+          callback: (token: string) => setTurnstileToken(token),
+          "expired-callback": () => setTurnstileToken(null),
+          "error-callback": () => setTurnstileToken(null),
+        });
+      }
+    };
+    const existing = document.querySelector(
+      'script[src*="challenges.cloudflare.com/turnstile"]'
+    );
+    if (existing) {
+      if ((window as unknown as { turnstile?: TurnstileApi }).turnstile) {
+        renderWidget();
+      } else {
+        existing.addEventListener("load", renderWidget);
+      }
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    script.defer = true;
+    script.onload = renderWidget;
+    document.body.appendChild(script);
+  }, [siteKey]);
+
+  function resetTurnstile() {
+    setTurnstileToken(null);
+    const turnstile = (window as unknown as { turnstile?: TurnstileApi })
+      .turnstile;
+    if (turnstile) {
+      turnstile.reset(widgetIdRef.current ?? undefined);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,13 +89,14 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, turnstileToken }),
       });
 
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Gagal masuk");
         setLoading(false);
+        resetTurnstile();
         return;
       }
 
@@ -147,6 +217,14 @@ export default function LoginPage() {
                 />
               </div>
             </div>
+
+            {siteKey ? (
+              <div id="turnstile-widget" ref={widgetRef} className="flex justify-center" />
+            ) : (
+              <p className="text-xs text-red-600 text-center">
+                Verifikasi keamanan belum dikonfigurasi — hubungi panitia.
+              </p>
+            )}
 
             <button
               type="submit"
