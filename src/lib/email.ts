@@ -1,7 +1,5 @@
-import { Resend } from "resend";
-
 // Pengirim dibaca dari env agar pindah domain tinggal ganti konfigurasi.
-// Nilai default = pengirim testing yang sudah terverifikasi di Resend.
+// Domain pengirim harus sudah diautentikasi di Brevo (kode TXT + DKIM).
 export function getEmailFrom(): string {
   return (
     process.env.EMAIL_FROM ||
@@ -15,14 +13,22 @@ export function getAppUrl(): string {
   );
 }
 
-function getResend(): Resend {
-  const key = process.env.RESEND_API_KEY;
+function getBrevoKey(): string {
+  const key = process.env.BREVO_API_KEY;
   if (!key) {
-    throw new Error(
-      "RESEND_API_KEY belum dipasang di environment aplikasi."
-    );
+    throw new Error("BREVO_API_KEY belum dipasang di environment aplikasi.");
   }
-  return new Resend(key);
+  return key;
+}
+
+// EMAIL_FROM berbentuk "Nama <email@domain>" atau email polos.
+// Brevo meminta sender sebagai { name, email } terpisah.
+function parseEmailFrom(value: string): { name: string; email: string } {
+  const match = value.match(/^(.*)<([^>]+)>\s*$/);
+  if (match) {
+    return { name: match[1].trim(), email: match[2].trim() };
+  }
+  return { name: "", email: value.trim() };
 }
 
 // Escape nilai dari database sebelum disisipkan ke HTML email.
@@ -120,22 +126,39 @@ export async function sendCredentialsEmail(input: {
   username: string;
   password: string;
 }): Promise<string> {
-  const resend = getResend();
+  const apiKey = getBrevoKey();
   // PENTING: password hanya ada di isi email ini. Jangan pernah me-log
   // nilai ini dan jangan pernah mengembalikannya lewat API.
   const appUrl = getAppUrl();
-  const { data, error } = await resend.emails.send({
-    from: getEmailFrom(),
-    to: [input.to],
-    subject: "Akun Ujian Olimpiade Nahwu Shorof Nasional 2026",
-    html: buildCredentialsHtml(input, appUrl),
-    text: buildCredentialsText(input, appUrl),
+  const sender = parseEmailFrom(getEmailFrom());
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "api-key": apiKey,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      sender: sender.name ? sender : { email: sender.email },
+      to: [{ email: input.to }],
+      subject: "Akun Ujian Olimpiade Nahwu Shorof Nasional 2026",
+      htmlContent: buildCredentialsHtml(input, appUrl),
+      textContent: buildCredentialsText(input, appUrl),
+    }),
   });
-  if (error) {
-    throw new Error(error.message || "Gagal mengirim email lewat Resend.");
+  // Brevo mengembalikan { messageId } saat sukses; { message, code } saat gagal.
+  const body = (await res.json().catch(() => null)) as {
+    messageId?: string;
+    message?: string;
+  } | null;
+  if (!res.ok) {
+    throw new Error(body?.message || "Gagal mengirim email lewat Brevo.");
   }
-  if (!data?.id) {
-    throw new Error("Resend tidak mengembalikan ID email.");
+  if (!body?.messageId) {
+    throw new Error("Brevo tidak mengembalikan ID email.");
   }
-  return data.id;
+  // ID ini disimpan pemanggil ke EmailLog.resendId. Kolom itu dipakai
+  // ulang sebagai ID pesan provider (dulu ID Resend, kini messageId
+  // Brevo) agar tidak perlu migrasi skema.
+  return body.messageId;
 }
