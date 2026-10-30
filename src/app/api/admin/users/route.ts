@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function GET(req: Request) {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") {
@@ -24,7 +26,6 @@ export async function GET(req: Request) {
       role: true,
       institution: true,
       phone: true,
-      category: true,
       email: true,
       isActive: true,
       createdAt: true,
@@ -58,7 +59,7 @@ export async function POST(req: Request) {
       role = "PARTICIPANT",
       institution,
       phone,
-      category,
+      email,
       isActive = true,
     } = body;
 
@@ -67,6 +68,26 @@ export async function POST(req: Request) {
         { error: "Username, nama lengkap, dan password wajib diisi" },
         { status: 400 }
       );
+    }
+
+    const cleanEmail = email?.trim() || "";
+    if (cleanEmail && !EMAIL_RE.test(cleanEmail)) {
+      return NextResponse.json(
+        { error: "Format email tidak valid" },
+        { status: 400 }
+      );
+    }
+
+    if (cleanEmail) {
+      const emailTaken = await prisma.user.findFirst({
+        where: { email: { equals: cleanEmail, mode: "insensitive" } },
+      });
+      if (emailTaken) {
+        return NextResponse.json(
+          { error: "Email sudah dipakai akun lain" },
+          { status: 400 }
+        );
+      }
     }
 
     const cleanUsername = username.trim();
@@ -91,7 +112,7 @@ export async function POST(req: Request) {
         role: role === "ADMIN" ? "ADMIN" : "PARTICIPANT",
         institution: institution?.trim() || null,
         phone: phone?.trim() || null,
-        category: category?.trim() || null,
+        email: cleanEmail || null,
         isActive: Boolean(isActive),
       },
     });
@@ -103,7 +124,7 @@ export async function POST(req: Request) {
         name: user.name,
         role: user.role,
         institution: user.institution,
-        category: user.category,
+        email: user.email,
       },
     });
   } catch (error) {

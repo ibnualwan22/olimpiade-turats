@@ -19,7 +19,6 @@ async function main() {
       passwordHash: adminPassword,
       role: "ADMIN",
       institution: "Panitia Pusat Olimpiade Turats",
-      category: "Panitia",
     },
   });
 
@@ -29,28 +28,24 @@ async function main() {
       username: "peserta01",
       name: "Ahmad Zaki Al-Faruq",
       institution: "PP. Lirboyo Kediri",
-      category: "Ulya (Tingkat Atas)",
       phone: "081234567801",
     },
     {
       username: "peserta02",
       name: "Fatimah Az-Zahra",
       institution: "PP. Al-Munawwir Krapyak",
-      category: "Ulya (Tingkat Atas)",
       phone: "081234567802",
     },
     {
       username: "peserta03",
       name: "Muhammad ইবনu Malik",
       institution: "PP. Sidogiri Pasuruan",
-      category: "Wustha (Tingkat Menengah)",
       phone: "081234567803",
     },
     {
       username: "peserta04",
       name: "Nabila Khairunnisa",
       institution: "PP. Darussalam Gontor",
-      category: "Wustha (Tingkat Menengah)",
       phone: "081234567804",
     },
   ];

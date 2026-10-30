@@ -9,7 +9,6 @@ interface ParticipantUser {
   name: string;
   institution: string | null;
   phone: string | null;
-  category: string | null;
   email: string | null;
   isActive: boolean;
   emailLogs: { status: string; createdAt: string }[];
@@ -44,7 +43,7 @@ export default function AdminParticipantsPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [institution, setInstitution] = useState("");
-  const [category, setCategory] = useState("Ulya (Tingkat Atas)");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -80,7 +79,7 @@ export default function AdminParticipantsPage() {
     setName("");
     setPassword("peserta123");
     setInstitution("");
-    setCategory("Ulya (Tingkat Atas)");
+    setEmail("");
     setPhone("");
     setIsActive(true);
     setShowModal(true);
@@ -92,7 +91,7 @@ export default function AdminParticipantsPage() {
     setName(p.name);
     setPassword("");
     setInstitution(p.institution || "");
-    setCategory(p.category || "");
+    setEmail(p.email || "");
     setPhone(p.phone || "");
     setIsActive(p.isActive);
     setShowModal(true);
@@ -117,7 +116,7 @@ export default function AdminParticipantsPage() {
           password,
           role: "PARTICIPANT",
           institution,
-          category,
+          email,
           phone,
           isActive,
         }),
@@ -443,7 +442,6 @@ export default function AdminParticipantsPage() {
                   <th className="p-4">Username / No. Peserta</th>
                   <th className="p-4">Nama Lengkap</th>
                   <th className="p-4">Asal Pesantren / Instansi</th>
-                  <th className="p-4">Kategori</th>
                   <th className="p-4">Email</th>
                   <th className="p-4">Status Kirim</th>
                   <th className="p-4">Status</th>
@@ -459,11 +457,6 @@ export default function AdminParticipantsPage() {
                     <td className="p-4 font-bold text-zinc-900">{p.name}</td>
                     <td className="p-4 text-zinc-600">
                       {p.institution || "-"}
-                    </td>
-                    <td className="p-4">
-                      <span className="px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-700 text-xs font-semibold">
-                        {p.category || "Umum"}
-                      </span>
                     </td>
                     <td className="p-4 text-zinc-600">{p.email || "-"}</td>
                     <td className="p-4">
@@ -553,9 +546,6 @@ export default function AdminParticipantsPage() {
                   </div>
                   <div className="text-xs text-zinc-500">
                     {p.institution || "-"}
-                    <span className="ml-2 px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 font-semibold">
-                      {p.category || "Umum"}
-                    </span>
                   </div>
                   <div className="text-xs text-zinc-500">
                     {p.email || "Belum ada email"} · Kirim: {sendStatus(p)}
@@ -672,13 +662,13 @@ export default function AdminParticipantsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-zinc-700 mb-1">
-                    Tingkat / Kategori
+                    Email Peserta
                   </label>
                   <input
-                    type="text"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder="Wustha / Ulya / Umum"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="nama@email.com"
                     className="w-full px-3.5 py-2 rounded-xl border border-zinc-300 text-sm"
                   />
                 </div>

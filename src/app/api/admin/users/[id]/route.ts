@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -22,9 +24,34 @@ export async function PUT(
       role,
       institution,
       phone,
-      category,
+      email,
       isActive,
     } = body;
+
+    let cleanEmail: string | undefined;
+    if (email !== undefined) {
+      cleanEmail = email?.trim() || "";
+      if (cleanEmail && !EMAIL_RE.test(cleanEmail)) {
+        return NextResponse.json(
+          { error: "Format email tidak valid" },
+          { status: 400 }
+        );
+      }
+      if (cleanEmail) {
+        const emailTaken = await prisma.user.findFirst({
+          where: {
+            email: { equals: cleanEmail, mode: "insensitive" },
+            id: { not: id },
+          },
+        });
+        if (emailTaken) {
+          return NextResponse.json(
+            { error: "Email sudah dipakai akun lain" },
+            { status: 400 }
+          );
+        }
+      }
+    }
 
     const updateData: Record<string, unknown> = {
       username: username?.trim(),
@@ -32,7 +59,7 @@ export async function PUT(
       role: role === "ADMIN" ? "ADMIN" : "PARTICIPANT",
       institution: institution?.trim() || null,
       phone: phone?.trim() || null,
-      category: category?.trim() || null,
+      ...(email !== undefined ? { email: cleanEmail || null } : {}),
       isActive: Boolean(isActive),
     };
 

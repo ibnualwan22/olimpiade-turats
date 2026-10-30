@@ -36,7 +36,6 @@ model User {
   role         Role          @default(PARTICIPANT)
   institution  String?
   phone        String?
-  category     String?
   email        String?
   isActive     Boolean       @default(true)
   attempts     ExamAttempt[]

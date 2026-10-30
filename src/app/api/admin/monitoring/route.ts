@@ -61,7 +61,6 @@ export async function GET(req: Request) {
           username: true,
           name: true,
           institution: true,
-          category: true,
         },
       },
       session: {

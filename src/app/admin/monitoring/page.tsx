@@ -30,7 +30,6 @@ interface MonitoringAttempt {
     username: string;
     name: string;
     institution: string | null;
-    category: string | null;
   };
   session: {
     id: string;
