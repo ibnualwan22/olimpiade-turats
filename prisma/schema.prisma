@@ -135,6 +135,10 @@ model ExamAttempt {
   tokenVerifiedAt  DateTime        @default(now())
   startedAt        DateTime?
   expiresAt        DateTime?
+  // Sinyal aktivitas terakhir peserta selama mengerjakan (heartbeat
+  // 30 detik dari halaman ujian + setiap simpan jawaban). Dipakai
+  // monitoring untuk membedakan "masih online" dari "browser ditutup".
+  lastSeenAt       DateTime?
   extraMinutes     Int             @default(0)
   finishedAt       DateTime?
   timeSpentSeconds Int?

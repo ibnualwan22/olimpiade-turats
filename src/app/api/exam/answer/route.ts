@@ -71,6 +71,12 @@ export async function POST(req: Request) {
       },
     });
 
+    // Sinyal aktivitas untuk monitoring (pelengkap heartbeat 30 detik).
+    await prisma.examAttempt.update({
+      where: { id: attemptId },
+      data: { lastSeenAt: now },
+    });
+
     return NextResponse.json({ answer, serverTime: now.toISOString() });
   } catch (error) {
     console.error("Save answer error:", error);

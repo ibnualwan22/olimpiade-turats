@@ -176,6 +176,30 @@ export default function ExamPlayPage({
     return () => clearInterval(timer);
   }, [attempt, remainingSeconds, handleSubmitExam]);
 
+  // Heartbeat aktivitas untuk monitoring: kirim tiap 30 detik selama
+  // ujian berjalan, supaya panitia tahu peserta masih online. Gagal
+  // diam-diam (tidak mengganggu peserta) dan berhenti saat ujian selesai.
+  useEffect(() => {
+    if (!attempt || attempt.status !== "IN_PROGRESS" || !attempt.startedAt) {
+      return;
+    }
+    let stopped = false;
+    const ping = () => {
+      if (stopped) return;
+      fetch("/api/exam/heartbeat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ attemptId: attempt.id }),
+      }).catch(() => {});
+    };
+    ping();
+    const interval = setInterval(ping, 30000);
+    return () => {
+      stopped = true;
+      clearInterval(interval);
+    };
+  }, [attempt]);
+
   async function saveAnswerToServer(
     questionId: string,
     selectedOptionId: string | null,
@@ -282,7 +306,13 @@ export default function ExamPlayPage({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div
+              className={`grid gap-3 text-sm ${
+                sessionInfo?.speedScoringMode === "TIE_BREAKER"
+                  ? "grid-cols-1"
+                  : "grid-cols-2"
+              }`}
+            >
               <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
                 <div className="text-xs text-zinc-500 flex items-center gap-1">
                   <Trophy className="w-3.5 h-3.5 text-amber-600" /> Skor Bobot
@@ -298,14 +328,16 @@ export default function ExamPlayPage({
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
-                <div className="text-xs text-amber-800 flex items-center gap-1">
-                  <Zap className="w-3.5 h-3.5 text-amber-600" /> Bonus Kecepatan
+              {sessionInfo?.speedScoringMode !== "TIE_BREAKER" && (
+                <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
+                  <div className="text-xs text-amber-800 flex items-center gap-1">
+                    <Zap className="w-3.5 h-3.5 text-amber-600" /> Bonus Kecepatan
+                  </div>
+                  <div className="text-xl font-bold text-amber-900 mt-1">
+                    +{attempt.speedBonus}
+                  </div>
                 </div>
-                <div className="text-xl font-bold text-amber-900 mt-1">
-                  +{attempt.speedBonus}
-                </div>
-              </div>
+              )}
             </div>
 
             <button
@@ -639,12 +671,16 @@ export default function ExamPlayPage({
           <div className="bg-zinc-900 text-white rounded-xl p-5 space-y-2">
             <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
               <Zap className="w-4 h-4" />
-              <span>Info Penilaian Kecepatan</span>
+              <span>
+                {sessionInfo?.speedScoringMode === "TIE_BREAKER"
+                  ? "Penentu Peringkat Seri"
+                  : "Info Penilaian Kecepatan"}
+              </span>
             </div>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              Semakin cepat Anda menyelesaikan ujian dengan jawaban yang{" "}
-              <strong>tepat</strong>, semakin besar tambahan poin kecepatan yang
-              Anda peroleh.
+              {sessionInfo?.speedScoringMode === "TIE_BREAKER"
+                ? "Bila ada nilai yang sama, peserta yang selesai lebih dulu menempati peringkat lebih tinggi."
+                : "Semakin cepat Anda menyelesaikan ujian dengan jawaban yang tepat, semakin besar tambahan poin kecepatan yang Anda peroleh."}
             </p>
           </div>
         </div>

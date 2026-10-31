@@ -175,10 +175,13 @@ export async function GET(req: Request) {
           q
             ? {
                 ...q,
+                // Label ulang sesuai posisi tampil: layar selalu A, B, C, D
+                // berurutan, yang teracak hanya isinya. Penilaian memakai
+                // ID opsi, bukan label, jadi tidak berubah.
                 options: shuffleDeterministic(
                   q.options,
                   `${attempt.id}:${q.id}`
-                ),
+                ).map((o, i) => ({ ...o, label: String.fromCharCode(65 + i) })),
               }
             : q
         )

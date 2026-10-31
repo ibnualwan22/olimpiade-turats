@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { calculateAndSaveAttemptScore } from "@/lib/scoring";
+import { countAnswers } from "@/lib/monitoring";
 
 export async function GET(req: Request) {
   const session = await getSession();
@@ -33,6 +34,8 @@ export async function GET(req: Request) {
     return NextResponse.json({
       sessions: [],
       attempts: [],
+      summary: null,
+      questionStats: [],
       serverTime: new Date().toISOString(),
     });
   }
@@ -72,8 +75,14 @@ export async function GET(req: Request) {
           _count: { select: { questions: true } },
         },
       },
-      _count: {
-        select: { answers: true },
+      answers: {
+        select: {
+          questionId: true,
+          selectedOptionId: true,
+          isDoubtful: true,
+          answeredAt: true,
+          selectedOption: { select: { isCorrect: true } },
+        },
       },
     },
     // GELOMBANG 2: penentu seri sesuai aturan yang diiklankan —
@@ -88,11 +97,101 @@ export async function GET(req: Request) {
     ],
   });
 
+  const totalQuestions =
+    sessions.find((s) => s.id === targetSessionId)?._count.questions ?? 0;
+
+  // Hitungan benar/salah dihitung di server supaya payload polling
+  // tetap ringan (baris jawaban tidak ikut dikirim ke klien).
+  const attemptRows = attempts.map((a) => {
+    const counts = countAnswers(a.answers);
+    const { answers: _answers, ...rest } = a;
+    return {
+      ...rest,
+      answeredCount: counts.answered,
+      correctCount: counts.correct,
+      wrongCount: counts.wrong,
+      doubtfulCount: counts.doubtful,
+      unansweredCount: Math.max(0, totalQuestions - counts.answered),
+      lastAnsweredAt: counts.lastAnsweredAt,
+    };
+  });
+
+  // Ringkasan sesi: peserta yang belum memasukkan token = akun peserta
+  // aktif tanpa attempt pada sesi ini (termasuk akun contoh bila masih
+  // ada — panitia perlu tahu angka ini apa adanya).
+  const totalParticipants = await prisma.user.count({
+    where: { role: "PARTICIPANT", isActive: true },
+  });
+  const summary = {
+    totalParticipants,
+    notStarted: Math.max(0, totalParticipants - attempts.length),
+    rules: attempts.filter(
+      (a) => a.status === "IN_PROGRESS" && !a.startedAt
+    ).length,
+    working: attempts.filter(
+      (a) => a.status === "IN_PROGRESS" && a.startedAt
+    ).length,
+    finished: attempts.filter((a) => a.status !== "IN_PROGRESS").length,
+  };
+
+  // Statistik per soal. Penyebut = peserta yang sudah klik mulai
+  // (yang belum mulai tidak dihitung sebagai "kosong" untuk semua soal).
+  const startedAttempts = attempts.filter((a) => a.startedAt);
+  const sessionQuestions = await prisma.sessionQuestion.findMany({
+    where: { sessionId: targetSessionId },
+    include: {
+      question: {
+        select: {
+          id: true,
+          content: true,
+          category: { select: { name: true } },
+        },
+      },
+    },
+    orderBy: { orderIndex: "asc" },
+  });
+  const perQuestion = new Map<
+    string,
+    { correct: number; wrong: number; answered: number }
+  >();
+  for (const a of startedAttempts) {
+    for (const ans of a.answers) {
+      if (!ans.selectedOptionId) continue;
+      const entry = perQuestion.get(ans.questionId) ?? {
+        correct: 0,
+        wrong: 0,
+        answered: 0,
+      };
+      entry.answered += 1;
+      if (ans.selectedOption?.isCorrect) entry.correct += 1;
+      else entry.wrong += 1;
+      perQuestion.set(ans.questionId, entry);
+    }
+  }
+  const questionStats = sessionQuestions.map((sq, idx) => {
+    const entry = perQuestion.get(sq.questionId) ?? {
+      correct: 0,
+      wrong: 0,
+      answered: 0,
+    };
+    return {
+      questionId: sq.questionId,
+      order: idx + 1,
+      content: sq.question.content,
+      category: sq.question.category?.name ?? null,
+      correct: entry.correct,
+      wrong: entry.wrong,
+      unanswered: Math.max(0, startedAttempts.length - entry.answered),
+      denominator: startedAttempts.length,
+    };
+  });
+
   return NextResponse.json({
     sessions,
     selectedSessionId: targetSessionId,
-    attempts,
+    attempts: attemptRows,
+    summary,
+    questionStats,
     serverTime: now.toISOString(),
   });
 }
-

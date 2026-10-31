@@ -124,7 +124,7 @@ export default function AdminSessionsPage() {
     setTitle("");
     setDescription("");
     setRulesContent(
-      `1. Peserta wajib membaca Basmalah dan berdoa sebelum memulai perlombaan.\n2. Waktu pengerjaan dimulai otomatis saat tombol "Mulai Kerjakan Sekarang" ditekan.\n3. Setiap soal memiliki bobot nilai tersendiri.\n4. Peserta yang selesai lebih cepat dengan jawaban tepat akan mendapat Bonus Poin Kecepatan.\n5. Dilarang membuka kitab/kamus atau bekerja sama selama ujian.`
+      `1. Lomba bersifat individu.\n2. Tidak ada batasan usia.\n3. Melampirkan kartu identitas (KTP, KTM, Kartu Pelajar, dsb).\n4. Lomba dilaksanakan secara online melalui CBT Siakad Markaz Arabiyah.\n5. Soal berupa pilihan ganda berjumlah 50 soal.\n6. Pertanyaan diambil dari Materi Kitab Al-Jurumiyah dan Amtsilatu Tasrifiyyah.\n7. Diperbolehkan melihat referensi materi saat mengerjakan.\n8. Pemenang diambil berdasarkan peserta dengan nilai tertinggi (apabila ada kesamaan nilai maka diambil dari durasi tercepat).`
     );
     generateRandomToken();
     setDurationMinutes(45);

@@ -96,21 +96,29 @@ async function handlePreview(req: Request) {
     );
   }
 
-  const dbEmails = new Set(
-    (
-      await prisma.user.findMany({
-        where: { email: { not: null } },
-        select: { email: true },
-      })
-    ).map((u) => (u.email as string).toLowerCase())
-  );
+  // Kunci dedup = pasangan (nama, email): satu alamat email boleh dipakai
+  // bersama beberapa peserta (satu email institusi). Yang dilarang hanya
+  // pasangan nama+email yang sama persis. Map menyimpan username akun
+  // yang sudah ada, agar pratinjau bisa menampilkannya.
+  const dbPairs = new Map<string, string>();
+  for (const u of await prisma.user.findMany({
+    where: { email: { not: null } },
+    select: { name: true, email: true, username: true },
+  })) {
+    dbPairs.set(
+      `${u.name.toLowerCase()}|${(u.email as string).toLowerCase()}`,
+      u.username
+    );
+  }
+  const pairKey = (name: string, email: string) =>
+    `${name.toLowerCase()}|${email.toLowerCase()}`;
   const dbUsernames = new Set(
     (
       await prisma.user.findMany({ select: { username: true } })
     ).map((u) => u.username)
   );
 
-  const seenEmails = new Set<string>();
+  const seenPairs = new Set<string>();
   const preview: PreviewRow[] = [];
 
   for (let i = 0; i < rows.length; i++) {
@@ -122,30 +130,33 @@ async function handlePreview(req: Request) {
     if (!name) errors.push("Nama kosong");
     if (!email) errors.push("Email kosong");
     else if (!EMAIL_RE.test(email)) errors.push("Format email tidak valid");
-    const emailKey = email.toLowerCase();
-    if (email && seenEmails.has(emailKey)) {
-      errors.push("Email ganda dalam file");
+    const key = pairKey(name, email);
+    if (name && email && seenPairs.has(key)) {
+      errors.push("Nama dan email ganda dalam file");
     }
-    if (email) seenEmails.add(emailKey);
+    if (name && email) seenPairs.add(key);
 
     let status: PreviewRow["status"] = "baru";
     let userId: string | undefined;
     let username = "";
     if (errors.length === 0) {
-      if (dbEmails.has(emailKey)) {
+      const existingUsername = dbPairs.get(key);
+      if (existingUsername) {
         status = "sudah_ada";
+        username = existingUsername;
       } else {
         const nameMatches = await prisma.user.findMany({
           where: {
             role: "PARTICIPANT",
             name: { equals: name, mode: "insensitive" },
           },
-          select: { id: true, email: true },
+          select: { id: true, email: true, username: true },
         });
         const emptyEmailMatches = nameMatches.filter((m) => !m.email);
         if (emptyEmailMatches.length === 1) {
           status = "tambah_email";
           userId = emptyEmailMatches[0].id;
+          username = emptyEmailMatches[0].username;
         } else if (emptyEmailMatches.length > 1) {
           status = "error";
           errors.push("Nama ditemukan lebih dari satu tanpa email, periksa manual");
@@ -201,9 +212,8 @@ async function handleConfirm(req: Request) {
       skipped.push({ index: row.index, reason: "Baris bermasalah, dilewati" });
       continue;
     }
-    const emailKey = row.email.toLowerCase();
     if (row.status === "sudah_ada") {
-      skipped.push({ index: row.index, reason: "Email sudah terdaftar" });
+      skipped.push({ index: row.index, reason: "Nama dan email sudah terdaftar" });
       continue;
     }
     if (row.status === "tambah_email") {
@@ -219,12 +229,18 @@ async function handleConfirm(req: Request) {
         skipped.push({ index: row.index, reason: "Akun tujuan sudah memiliki email" });
         continue;
       }
+      // Email boleh dipakai bersama; yang dilarang hanya pasangan
+      // (nama akun tujuan, email) yang sudah ada di akun lain.
       const clash = await prisma.user.findFirst({
-        where: { email: { equals: row.email, mode: "insensitive" } },
+        where: {
+          name: { equals: target.name, mode: "insensitive" },
+          email: { equals: row.email, mode: "insensitive" },
+          id: { not: target.id },
+        },
         select: { id: true },
       });
       if (clash) {
-        skipped.push({ index: row.index, reason: "Email sudah terdaftar" });
+        skipped.push({ index: row.index, reason: "Nama dan email sudah terdaftar" });
         continue;
       }
       await prisma.user.update({
@@ -234,13 +250,17 @@ async function handleConfirm(req: Request) {
       updated++;
       continue;
     }
-    // status "baru"
+    // status "baru": tolak hanya bila pasangan (nama, email) sudah ada.
+    // Email yang sama dengan nama berbeda diizinkan (email institusi bersama).
     const clash = await prisma.user.findFirst({
-      where: { email: { equals: row.email, mode: "insensitive" } },
+      where: {
+        name: { equals: row.name, mode: "insensitive" },
+        email: { equals: row.email, mode: "insensitive" },
+      },
       select: { id: true },
     });
     if (clash) {
-      skipped.push({ index: row.index, reason: "Email sudah terdaftar" });
+      skipped.push({ index: row.index, reason: "Nama dan email sudah terdaftar" });
       continue;
     }
     const username = await uniqueUsername(
