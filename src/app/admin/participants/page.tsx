@@ -23,6 +23,7 @@ interface PreviewRow {
   username: string;
   status: string;
   userId?: string;
+  currentInstitution?: string;
   errors: string[];
 }
 
@@ -49,6 +50,7 @@ export default function AdminParticipantsPage() {
   const [saving, setSaving] = useState(false);
 
   const [importFile, setImportFile] = useState<File | null>(null);
+  const [importMode, setImportMode] = useState<"create" | "update">("create");
   const [previewRows, setPreviewRows] = useState<PreviewRow[] | null>(null);
   const [previewError, setPreviewError] = useState("");
   const [importing, setImporting] = useState(false);
@@ -149,6 +151,7 @@ export default function AdminParticipantsPage() {
     try {
       const form = new FormData();
       form.append("file", importFile);
+      form.append("mode", importMode);
       const res = await fetch("/api/admin/users/import", {
         method: "POST",
         body: form,
@@ -172,7 +175,7 @@ export default function AdminParticipantsPage() {
       const res = await fetch("/api/admin/users/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rows: previewRows }),
+        body: JSON.stringify({ rows: previewRows, mode: importMode }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -184,7 +187,9 @@ export default function AdminParticipantsPage() {
           ? `, dilewati ${data.skipped.length}`
           : "";
       setImportResult(
-        `Impor selesai: ${data.created} dibuat, ${data.updated} email ditambahkan${skippedText}.`
+        importMode === "update"
+          ? `Perbarui selesai: ${data.updated} instansi diisi${skippedText}.`
+          : `Impor selesai: ${data.created} dibuat, ${data.updated} email ditambahkan${skippedText}.`
       );
       setPreviewRows(null);
       setImportFile(null);
@@ -291,6 +296,41 @@ export default function AdminParticipantsPage() {
           </p>
         </div>
 
+        <div className="flex gap-4 text-xs font-semibold text-zinc-700">
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <input
+              type="radio"
+              name="import-mode"
+              checked={importMode === "create"}
+              onChange={() => {
+                setImportMode("create");
+                setPreviewRows(null);
+              }}
+            />
+            Buat akun baru
+          </label>
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <input
+              type="radio"
+              name="import-mode"
+              checked={importMode === "update"}
+              onChange={() => {
+                setImportMode("update");
+                setPreviewRows(null);
+              }}
+            />
+            Perbarui instansi saja
+          </label>
+        </div>
+        {importMode === "update" && (
+          <p className="text-xs text-zinc-500">
+            Mode perbarui: hanya mengisi instansi yang masih kosong untuk
+            akun yang cocok (nama + email). Tidak membuat akun baru, tidak
+            mengubah data lain, dan tidak menimpa instansi yang sudah
+            terisi. Kolom Asal Instansi wajib ada di file.
+          </p>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-2">
           <a
             href="/api/admin/users/import-template"
@@ -333,6 +373,9 @@ export default function AdminParticipantsPage() {
                     <th className="p-2.5">Baris</th>
                     <th className="p-2.5">Nama</th>
                     <th className="p-2.5">Email</th>
+                    {importMode === "update" && (
+                      <th className="p-2.5">Instansi Saat Ini</th>
+                    )}
                     <th className="p-2.5">Asal</th>
                     <th className="p-2.5">Username</th>
                     <th className="p-2.5">Status</th>
@@ -344,6 +387,11 @@ export default function AdminParticipantsPage() {
                       <td className="p-2.5">{r.index}</td>
                       <td className="p-2.5 font-bold">{r.name || "-"}</td>
                       <td className="p-2.5">{r.email || "-"}</td>
+                      {importMode === "update" && (
+                        <td className="p-2.5">
+                          {r.currentInstitution || "-"}
+                        </td>
+                      )}
                       <td className="p-2.5">{r.institution || "-"}</td>
                       <td className="p-2.5 font-mono">{r.username || "-"}</td>
                       <td className="p-2.5">
@@ -351,6 +399,11 @@ export default function AdminParticipantsPage() {
                         {r.status === "sudah_ada" && "Sudah ada (dilewati)"}
                         {r.status === "tambah_email" &&
                           "Tambah email ke akun lama"}
+                        {r.status === "perbarui" && "Perbarui"}
+                        {r.status === "sudah_terisi" &&
+                          "Sudah terisi (dilewati)"}
+                        {r.status === "tidak_cocok" &&
+                          "Tidak cocok (tidak dibuat)"}
                         {r.status === "error" && (
                           <span className="text-red-600 font-bold">
                             {r.errors.join("; ")}
@@ -374,7 +427,11 @@ export default function AdminParticipantsPage() {
                 disabled={importing}
                 className="px-5 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold disabled:opacity-50 cursor-pointer"
               >
-                {importing ? "Mengimpor..." : "Konfirmasi & Buat Akun"}
+                {importing
+                  ? "Mengimpor..."
+                  : importMode === "update"
+                    ? "Konfirmasi & Perbarui Instansi"
+                    : "Konfirmasi & Buat Akun"}
               </button>
             </div>
           </div>

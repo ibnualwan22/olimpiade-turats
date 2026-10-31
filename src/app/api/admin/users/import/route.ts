@@ -22,8 +22,17 @@ type PreviewRow = {
   email: string;
   institution: string;
   username: string;
-  status: "baru" | "sudah_ada" | "tambah_email" | "error";
+  status:
+    | "baru"
+    | "sudah_ada"
+    | "tambah_email"
+    | "error"
+    | "perbarui"
+    | "sudah_terisi"
+    | "tidak_cocok";
   userId?: string;
+  // Mode perbarui saja: instansi akun saat ini (untuk ditampilkan di pratinjau).
+  currentInstitution?: string;
   errors: string[];
 };
 
@@ -73,6 +82,7 @@ async function handlePreview(req: Request) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const { headers, rows } = await parseExcel(buffer);
+  const mode = form.get("mode") === "update" ? "update" : "create";
 
   const nameCol = findColumn(headers, ["nama lengkap", "nama"]);
   const emailCol = findColumn(headers, ["email", "e-mail", "alamat email"]);
@@ -86,6 +96,9 @@ async function handlePreview(req: Request) {
   const missing: string[] = [];
   if (!nameCol) missing.push("Nama Lengkap");
   if (!emailCol) missing.push("Email");
+  // Mode perbarui: instansi adalah inti perbaikan, jadi wajib ada.
+  // Ini mencegah terulangnya kasus instansi hilang diam-diam karena header salah.
+  if (mode === "update" && !instCol) missing.push("Asal Instansi");
   if (missing.length > 0) {
     return NextResponse.json(
       {
@@ -94,6 +107,76 @@ async function handlePreview(req: Request) {
       },
       { status: 400 }
     );
+  }
+
+  // Mode perbarui: hanya isi instansi yang masih kosong, tanpa membuat
+  // akun baru dan tanpa mengubah field lain. Kunci cocok = pasangan
+  // (nama, email), sama dengan aturan dedup impor biasa.
+  if (mode === "update") {
+    const seenPairs = new Set<string>();
+    const preview: PreviewRow[] = [];
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const name = row[nameCol as string]?.plain ?? "";
+      const email = row[emailCol as string]?.plain ?? "";
+      const institution = instCol ? row[instCol]?.plain ?? "" : "";
+      const errors: string[] = [];
+      if (!name) errors.push("Nama kosong");
+      if (!email) errors.push("Email kosong");
+      else if (!EMAIL_RE.test(email)) errors.push("Format email tidak valid");
+      if (!institution) errors.push("Instansi kosong di file");
+      const key = `${name.toLowerCase()}|${email.toLowerCase()}`;
+      if (name && email && seenPairs.has(key)) {
+        errors.push("Nama dan email ganda dalam file");
+      }
+      if (name && email) seenPairs.add(key);
+
+      let status: PreviewRow["status"] = "perbarui";
+      let userId: string | undefined;
+      let username = "";
+      let currentInstitution: string | undefined;
+      if (errors.length === 0) {
+        const matches = await prisma.user.findMany({
+          where: {
+            role: "PARTICIPANT",
+            name: { equals: name, mode: "insensitive" },
+            email: { equals: email, mode: "insensitive" },
+          },
+          select: { id: true, username: true, institution: true },
+        });
+        if (matches.length === 0) {
+          status = "tidak_cocok";
+        } else if (matches.length > 1) {
+          status = "error";
+          errors.push(
+            "Ditemukan lebih dari satu akun dengan nama dan email ini, periksa manual"
+          );
+        } else {
+          const match = matches[0];
+          userId = match.id;
+          username = match.username;
+          currentInstitution = match.institution ?? "";
+          if (match.institution) {
+            status = "sudah_terisi";
+          }
+        }
+      } else {
+        status = "error";
+      }
+
+      preview.push({
+        index: i + 2,
+        name,
+        email,
+        institution,
+        username,
+        status,
+        userId,
+        currentInstitution,
+        errors,
+      });
+    }
+    return NextResponse.json({ rows: preview });
   }
 
   // Kunci dedup = pasangan (nama, email): satu alamat email boleh dipakai
@@ -196,6 +279,52 @@ async function handleConfirm(req: Request) {
       { error: "Tidak ada baris untuk diimpor" },
       { status: 400 }
     );
+  }
+
+  // Mode perbarui: hanya isi instansi yang masih kosong. Tidak membuat
+  // akun baru, tidak mengubah field lain, tidak menimpa instansi yang
+  // sudah terisi (dicek ulang di sini agar pratinjau yang basi tetap aman).
+  if (body?.mode === "update") {
+    let updated = 0;
+    const skipped: { index: number; reason: string }[] = [];
+    for (const row of inputRows) {
+      if (row.status === "tidak_cocok") {
+        skipped.push({ index: row.index, reason: "Akun tidak ditemukan, tidak dibuat" });
+        continue;
+      }
+      if (row.status === "sudah_terisi") {
+        skipped.push({ index: row.index, reason: "Instansi sudah terisi" });
+        continue;
+      }
+      if (
+        row.status !== "perbarui" ||
+        !row.userId ||
+        !row.name ||
+        !row.email ||
+        !row.institution
+      ) {
+        skipped.push({ index: row.index, reason: "Baris bermasalah, dilewati" });
+        continue;
+      }
+      const target = await prisma.user.findUnique({
+        where: { id: row.userId },
+        select: { institution: true },
+      });
+      if (!target) {
+        skipped.push({ index: row.index, reason: "Akun tidak ditemukan" });
+        continue;
+      }
+      if (target.institution) {
+        skipped.push({ index: row.index, reason: "Instansi sudah terisi" });
+        continue;
+      }
+      await prisma.user.update({
+        where: { id: row.userId },
+        data: { institution: row.institution },
+      });
+      updated++;
+    }
+    return NextResponse.json({ created: 0, updated, skipped });
   }
 
   let created = 0;
