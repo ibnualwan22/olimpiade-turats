@@ -11,6 +11,12 @@ import {
   PlayCircle,
   Trophy,
   Zap,
+  User,
+  AtSign,
+  Mail,
+  MapPin,
+  ScrollText,
+  Info,
 } from "lucide-react";
 
 interface AttemptItem {
@@ -41,6 +47,7 @@ export default function ParticipantDashboardPage() {
     name: string;
     username: string;
     institution?: string | null;
+    email?: string | null;
     role: string;
   } | null>(null);
   const [attempts, setAttempts] = useState<AttemptItem[]>([]);
@@ -165,6 +172,70 @@ export default function ParticipantDashboardPage() {
       </header>
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+        {/* Kartu Data Diri Peserta */}
+        {user && (
+          <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+            <div className="bg-gradient-to-l from-amber-500 to-amber-400 px-6 sm:px-8 py-3.5 flex items-center gap-2">
+              <User className="w-4 h-4 text-zinc-950" />
+              <h2 className="font-bold text-zinc-950 text-sm">
+                Data Diri Peserta
+              </h2>
+            </div>
+            <div className="p-6 sm:p-8 flex flex-col sm:flex-row gap-5 items-start">
+              <div className="w-16 h-16 shrink-0 rounded-2xl bg-amber-400/20 border border-amber-400/50 flex items-center justify-center text-2xl font-extrabold text-amber-700">
+                {user.name.trim().charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 space-y-4 min-w-0">
+                <div>
+                  <div className="text-xl font-extrabold text-zinc-900">
+                    {user.name}
+                  </div>
+                  <div className="text-xs font-semibold text-amber-700 mt-0.5">
+                    Peserta Olimpiade Nahwu Shorof Nasional 2026
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-start gap-2.5 text-zinc-700">
+                    <AtSign className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>
+                      <span className="text-zinc-500 text-xs block">
+                        Username
+                      </span>
+                      <span className="font-mono font-semibold">
+                        {user.username}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-zinc-700">
+                    <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>
+                      <span className="text-zinc-500 text-xs block">
+                        Asal Instansi/Asal Kota
+                      </span>
+                      <span className="font-semibold">
+                        {user.institution || "-"}
+                      </span>
+                    </span>
+                  </div>
+                  {user.email && (
+                    <div className="flex items-start gap-2.5 text-zinc-700 sm:col-span-2">
+                      <Mail className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <span className="min-w-0">
+                        <span className="text-zinc-500 text-xs block">
+                          Email
+                        </span>
+                        <span className="font-semibold break-all">
+                          {user.email}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Card Input Token Ujian */}
         <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
           <div className="bg-zinc-900 p-6 sm:p-8 text-white">
@@ -206,7 +277,7 @@ export default function ParticipantDashboardPage() {
                 required
                 value={token}
                 onChange={(e) => setToken(e.target.value.toUpperCase())}
-                placeholder="KETIK TOKEN UJIAN (Contoh: TURATS2026)"
+                placeholder="KETIK TOKEN UJIAN"
                 className="flex-1 px-4 py-3.5 rounded-xl border-2 border-zinc-200 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 outline-none font-mono text-lg font-bold tracking-widest uppercase text-zinc-900 transition"
               />
               <button
@@ -223,17 +294,60 @@ export default function ParticipantDashboardPage() {
               </button>
             </form>
 
-            <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
-              <KeyRound className="w-3.5 h-3.5 text-amber-500" />
-              <span>
-                Tips Demo: Klik untuk mengisi token contoh{" "}
-                <button
-                  type="button"
-                  onClick={() => setToken("TURATS2026")}
-                  className="font-mono font-bold text-amber-700 underline cursor-pointer"
-                >
-                  TURATS2026
-                </button>
+            <div className="mt-4 flex gap-2.5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-900">
+              <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <p>
+                <b>
+                  Token akan dibagikan panitia saat simulasi dan pelaksanaan
+                  olimpiade.
+                </b>{" "}
+                Bila sudah menerima token, masukkan di atas untuk membaca Tata
+                Tertib dan memulai ujian.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tata Tertib Perlombaan */}
+        <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+          <div className="px-6 sm:px-8 py-4 border-b border-zinc-100 flex items-center gap-2">
+            <ScrollText className="w-4 h-4 text-amber-600" />
+            <h2 className="font-bold text-zinc-900 text-sm">
+              Tata Tertib Perlombaan
+            </h2>
+          </div>
+          <div className="p-6 sm:p-8">
+            <ol className="space-y-2.5 text-sm text-zinc-700 list-decimal list-inside marker:font-bold marker:text-amber-700">
+              <li>Lomba bersifat individu.</li>
+              <li>Tidak ada batasan usia.</li>
+              <li>
+                Melampirkan kartu identitas (KTP, KTM, Kartu Pelajar, dsb).
+              </li>
+              <li>
+                Lomba dilaksanakan secara online melalui CBT Siakad Markaz
+                Arabiyah.
+              </li>
+              <li>Soal berupa pilihan ganda berjumlah 50 soal.</li>
+              <li>
+                Pertanyaan diambil dari Materi Kitab Al-Jurumiyah dan Amtsilatu
+                Tasrifiyyah.
+              </li>
+              <li>
+                Diperbolehkan melihat referensi materi saat mengerjakan.
+              </li>
+              <li>
+                Pemenang diambil berdasarkan peserta dengan nilai tertinggi
+                (apabila ada kesamaan nilai maka diambil dari durasi tercepat).
+              </li>
+            </ol>
+            <div className="mt-5 pt-4 border-t border-zinc-100 flex flex-col sm:flex-row gap-2 sm:gap-6 text-xs text-zinc-500">
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-amber-600" />
+                Simulasi: Selasa, 3 November 2026, 13.00–14.30 WIB
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-amber-600" />
+                Pelaksanaan: Rabu, 4 November 2026, 13.00–14.30 WIB
               </span>
             </div>
           </div>

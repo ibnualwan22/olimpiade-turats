@@ -67,8 +67,15 @@ export async function GET(req: Request) {
       orderBy: { updatedAt: "desc" },
     });
 
+    // Email tidak ada di payload sesi login, ambil dari database agar
+    // kartu data diri peserta di dashboard lengkap.
+    const dbUser = await prisma.user.findUnique({
+      where: { id: userSession.userId },
+      select: { email: true },
+    });
+
     return NextResponse.json({
-      user: userSession,
+      user: { ...userSession, email: dbUser?.email ?? null },
       attempts,
       serverTime: new Date().toISOString(),
     });

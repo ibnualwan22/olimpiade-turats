@@ -373,10 +373,7 @@ export default function AdminParticipantsPage() {
                     <th className="p-2.5">Baris</th>
                     <th className="p-2.5">Nama</th>
                     <th className="p-2.5">Email</th>
-                    {importMode === "update" && (
-                      <th className="p-2.5">Instansi Saat Ini</th>
-                    )}
-                    <th className="p-2.5">Asal</th>
+                    <th className="p-2.5">Asal Instansi/Asal Kota</th>
                     <th className="p-2.5">Username</th>
                     <th className="p-2.5">Status</th>
                   </tr>
@@ -387,11 +384,6 @@ export default function AdminParticipantsPage() {
                       <td className="p-2.5">{r.index}</td>
                       <td className="p-2.5 font-bold">{r.name || "-"}</td>
                       <td className="p-2.5">{r.email || "-"}</td>
-                      {importMode === "update" && (
-                        <td className="p-2.5">
-                          {r.currentInstitution || "-"}
-                        </td>
-                      )}
                       <td className="p-2.5">{r.institution || "-"}</td>
                       <td className="p-2.5 font-mono">{r.username || "-"}</td>
                       <td className="p-2.5">

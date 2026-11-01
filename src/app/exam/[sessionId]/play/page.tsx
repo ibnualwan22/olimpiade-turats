@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback, use, useRef } from "react";
 import { renderRichText } from "@/lib/safeHtml";
 import { useRouter } from "next/navigation";
 import {
@@ -36,6 +36,91 @@ interface QuestionItem {
 interface AnswerState {
   selectedOptionId: string | null;
   isDoubtful: boolean;
+}
+
+// Cadangan jawaban di perangkat peserta (pelajaran dari ujian Usbu'i Siakad:
+// jawaban yang gagal terkirim tidak boleh hilang saat tab ditutup).
+// Satu entri per soal; `saved:false` berarti belum dikonfirmasi server.
+interface LocalAnswerEntry {
+  selectedOptionId: string | null;
+  isDoubtful: boolean;
+  saved: boolean;
+  updatedAt: number;
+}
+
+const localAnswersKey = (attemptId: string) =>
+  `olimpiade-answers:${attemptId}`;
+
+function readLocalAnswers(
+  attemptId: string
+): Record<string, LocalAnswerEntry> {
+  try {
+    const raw = window.localStorage.getItem(localAnswersKey(attemptId));
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed as Record<string, LocalAnswerEntry>;
+  } catch {
+    return {};
+  }
+}
+
+function writeLocalAnswers(
+  attemptId: string,
+  data: Record<string, LocalAnswerEntry>
+) {
+  try {
+    window.localStorage.setItem(localAnswersKey(attemptId), JSON.stringify(data));
+  } catch {
+    // Kuota penuh / mode privat: cadangan lokal dilewati, alur server tetap jalan.
+  }
+}
+
+// Kirim ulang semua jawaban tertunda untuk satu attempt. Idempotent (upsert
+// per soal di server), jadi kirim ganda tidak merusak data. Melewati entri
+// yang sudah diubah lagi sejak snapshot supaya kiriman lama tidak menimpa
+// jawaban baru. Mengembalikan true bila tidak ada lagi yang tertunda.
+async function flushPendingForAttempt(attemptId: string): Promise<boolean> {
+  const pending = Object.entries(readLocalAnswers(attemptId)).filter(
+    ([, e]) => e && !e.saved
+  );
+  for (const [questionId, entry] of pending) {
+    const current = readLocalAnswers(attemptId)[questionId];
+    if (!current || current.saved || current.updatedAt !== entry.updatedAt) {
+      continue;
+    }
+    try {
+      const res = await fetch("/api/exam/answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          attemptId,
+          questionId,
+          selectedOptionId: entry.selectedOptionId,
+          isDoubtful: entry.isDoubtful,
+        }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        if (errData.timeUp) {
+          window.location.reload();
+          return false;
+        }
+        continue; // tetap tertunda, dicoba lagi pada pemicu berikutnya
+      }
+      const after = readLocalAnswers(attemptId);
+      const afterEntry = after[questionId];
+      if (afterEntry && afterEntry.updatedAt === entry.updatedAt) {
+        afterEntry.saved = true;
+        writeLocalAnswers(attemptId, after);
+      }
+    } catch {
+      continue;
+    }
+  }
+  return !Object.values(readLocalAnswers(attemptId)).some(
+    (e) => e && !e.saved
+  );
 }
 
 export default function ExamPlayPage({
@@ -79,11 +164,21 @@ export default function ExamPlayPage({
   >("saved");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isTimeUp, setIsTimeUp] = useState(false);
+  // Auto-submit saat waktu habis hanya boleh jalan sekali (tanpa pengulangan
+  // otomatis — pengulangan tanpa jeda pernah membebani VPS di ujian Siakad).
+  const autoSubmitRef = useRef(false);
+  const autoSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const flushingRef = useRef(false);
 
   const handleSubmitExam = useCallback(
     async (attemptIdToSubmit: string) => {
       if (submitting) return;
       setSubmitting(true);
+      setSubmitError(null);
       try {
         const res = await fetch("/api/exam/submit", {
           method: "POST",
@@ -94,7 +189,22 @@ export default function ExamPlayPage({
           const data = await res.json();
           setAttempt(data.attempt);
           setShowConfirmModal(false);
+          try {
+            window.localStorage.removeItem(
+              localAnswersKey(attemptIdToSubmit)
+            );
+          } catch {
+            // abaikan
+          }
+        } else {
+          setSubmitError(
+            "Gagal mengumpulkan ujian. Periksa koneksi Anda lalu klik Kumpulkan lagi."
+          );
         }
+      } catch {
+        setSubmitError(
+          "Gagal mengumpulkan ujian. Periksa koneksi Anda lalu klik Kumpulkan lagi."
+        );
       } finally {
         setSubmitting(false);
       }
@@ -135,6 +245,33 @@ export default function ExamPlayPage({
         }
         setAnswers(ansMap);
 
+        // Gabung cadangan lokal: jawaban yang belum terkirim (mis. tab
+        // tertutup setelah gagal simpan) dipakai lagi dan dikirim ulang.
+        // Cadangan lokal hanya menimpa soal yang statusnya tertunda; soal
+        // yang sudah tersimpan tetap mengikuti server.
+        if (
+          data.attempt.status === "IN_PROGRESS" &&
+          data.attempt.startedAt
+        ) {
+          const local = readLocalAnswers(data.attempt.id);
+          const pendingEntries = Object.entries(local).filter(
+            ([, e]) => e && !e.saved
+          );
+          if (pendingEntries.length > 0) {
+            setAnswers((prev) => {
+              const merged = { ...prev };
+              for (const [qid, e] of pendingEntries) {
+                merged[qid] = {
+                  selectedOptionId: e.selectedOptionId,
+                  isDoubtful: e.isDoubtful,
+                };
+              }
+              return merged;
+            });
+            void flushPendingForAttempt(data.attempt.id);
+          }
+        }
+
         if (data.attempt.status === "IN_PROGRESS" && data.attempt.expiresAt) {
           const serverNow = new Date(data.serverTime).getTime();
           const expiry = new Date(data.attempt.expiresAt).getTime();
@@ -148,6 +285,13 @@ export default function ExamPlayPage({
     load();
   }, [sessionId, router]);
 
+  // Attempt baru (id berubah) -> reset penanda waktu habis & auto-submit.
+  useEffect(() => {
+    autoSubmitRef.current = false;
+    setIsTimeUp(false);
+    setSubmitError(null);
+  }, [attempt?.id]);
+
   // Countdown Timer Effect
   useEffect(() => {
     if (
@@ -159,8 +303,23 @@ export default function ExamPlayPage({
     }
 
     if (remainingSeconds <= 0) {
-      handleSubmitExam(attempt.id);
-      return;
+      // Waktu habis: kunci jawaban (server juga menolak jawaban baru) dan
+      // coba kumpulkan SEKALI dengan jeda acak 0-15 detik supaya 500 peserta
+      // tidak menembak submit di detik yang sama. Kalau gagal, TIDAK diulang
+      // otomatis — peserta memakai tombol Kumpulkan manual di banner.
+      setIsTimeUp(true);
+      if (!autoSubmitRef.current) {
+        autoSubmitRef.current = true;
+        const jitter = Math.floor(Math.random() * 15000);
+        autoSubmitTimerRef.current = setTimeout(() => {
+          void handleSubmitExam(attempt.id);
+        }, jitter);
+      }
+      return () => {
+        if (autoSubmitTimerRef.current) {
+          clearTimeout(autoSubmitTimerRef.current);
+        }
+      };
     }
 
     const timer = setInterval(() => {
@@ -200,18 +359,73 @@ export default function ExamPlayPage({
     };
   }, [attempt]);
 
+  // Kirim ulang jawaban tertunda: saat kembali online, saat tab kembali
+  // terlihat, dan berkala. Tanpa beban ekstra: bila tidak ada yang tertunda,
+  // tidak ada request sama sekali (hanya baca localStorage).
+  useEffect(() => {
+    if (!attempt || attempt.status !== "IN_PROGRESS" || !attempt.startedAt) {
+      return;
+    }
+    const flush = () => {
+      if (flushingRef.current) return;
+      flushingRef.current = true;
+      void flushPendingForAttempt(attempt.id)
+        .then((allSent) => {
+          setSavingStatus(allSent ? "saved" : "error");
+        })
+        .finally(() => {
+          flushingRef.current = false;
+        });
+    };
+    const onOnline = () => flush();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") flush();
+    };
+    window.addEventListener("online", onOnline);
+    document.addEventListener("visibilitychange", onVisible);
+    const interval = setInterval(flush, 30000);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      document.removeEventListener("visibilitychange", onVisible);
+      clearInterval(interval);
+    };
+  }, [attempt]);
+
+  // Bersihkan cadangan lokal begitu attempt selesai (terkumpul / waktu habis
+  // terfinalisasi) supaya tidak ada sisa jawaban di perangkat.
+  useEffect(() => {
+    if (!attempt || attempt.status === "IN_PROGRESS") return;
+    try {
+      window.localStorage.removeItem(localAnswersKey(attempt.id));
+    } catch {
+      // abaikan
+    }
+  }, [attempt]);
+
   async function saveAnswerToServer(
     questionId: string,
     selectedOptionId: string | null,
     isDoubtful: boolean
   ) {
     if (!attempt || attempt.status !== "IN_PROGRESS") return;
+    if (isTimeUp) return; // waktu habis: jawaban dikunci
 
     setAnswers((prev) => ({
       ...prev,
       [questionId]: { selectedOptionId, isDoubtful },
     }));
     setSavingStatus("saving");
+
+    // Tulis cadangan lokal DULU (saved:false), baru kirim ke server.
+    const now = Date.now();
+    const local = readLocalAnswers(attempt.id);
+    local[questionId] = {
+      selectedOptionId,
+      isDoubtful,
+      saved: false,
+      updatedAt: now,
+    };
+    writeLocalAnswers(attempt.id, local);
 
     try {
       const res = await fetch("/api/exam/answer", {
@@ -232,7 +446,21 @@ export default function ExamPlayPage({
           return;
         }
         setSavingStatus("error");
-        return;
+        return; // tetap tertunda di localStorage untuk kirim ulang
+      }
+
+      // Tandai sudah tersimpan — hanya bila entri lokal belum diubah lagi
+      // oleh klik yang lebih baru (klik baru menangani pengirimannya sendiri).
+      const after = readLocalAnswers(attempt.id);
+      const entry = after[questionId];
+      if (
+        entry &&
+        entry.selectedOptionId === selectedOptionId &&
+        entry.isDoubtful === isDoubtful &&
+        entry.updatedAt <= now
+      ) {
+        entry.saved = true;
+        writeLocalAnswers(attempt.id, after);
       }
 
       setSavingStatus("saved");
@@ -399,7 +627,7 @@ export default function ExamPlayPage({
                 {savingStatus === "saving"
                   ? "Menyimpan..."
                   : savingStatus === "error"
-                  ? "Gagal simpan otomatis"
+                  ? "Gagal simpan, mencoba ulang otomatis"
                   : "Tersimpan otomatis"}
               </span>
             </div>
@@ -434,6 +662,31 @@ export default function ExamPlayPage({
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Question Card (Left 8/12) */}
         <div className="lg:col-span-8 flex flex-col gap-4">
+          {isTimeUp && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-5 space-y-2">
+              <p className="font-bold text-sm text-red-800">
+                Waktu habis. Jawaban Anda sudah tersimpan.
+              </p>
+              {submitError ? (
+                <>
+                  <p className="text-sm text-red-700">{submitError}</p>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleSubmitExam(attempt.id)}
+                    className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs cursor-pointer"
+                  >
+                    {submitting ? "Mengumpulkan..." : "Kumpulkan Sekarang"}
+                  </button>
+                </>
+              ) : (
+                <p className="text-xs text-red-700">
+                  Nilai Anda sedang difinalisasi. Bila halaman ini tidak
+                  berubah, klik tombol Selesai &amp; Kumpulkan di atas.
+                </p>
+              )}
+            </div>
+          )}
           {currentQuestion && (
             <div className="bg-white rounded-xl shadow-xs border border-zinc-200 overflow-hidden flex-1 flex flex-col justify-between">
               <div>
@@ -514,6 +767,7 @@ export default function ExamPlayPage({
                         <button
                           key={opt.id}
                           type="button"
+                          disabled={isTimeUp}
                           onClick={() =>
                             saveAnswerToServer(
                               currentQuestion.id,
@@ -521,7 +775,7 @@ export default function ExamPlayPage({
                               currentAnswer.isDoubtful
                             )
                           }
-                          className={`w-full p-4 rounded-xl border-2 transition flex items-center gap-4 text-left cursor-pointer ${
+                          className={`w-full p-4 rounded-xl border-2 transition flex items-center gap-4 text-left cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                             isSelected
                               ? "border-amber-500 bg-amber-50/70 shadow-xs"
                               : "border-zinc-200 hover:border-amber-300 bg-white"
@@ -568,6 +822,7 @@ export default function ExamPlayPage({
 
                 <button
                   type="button"
+                  disabled={isTimeUp}
                   onClick={() =>
                     saveAnswerToServer(
                       currentQuestion.id,
@@ -575,7 +830,7 @@ export default function ExamPlayPage({
                       !currentAnswer.isDoubtful
                     )
                   }
-                  className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 border transition cursor-pointer ${
+                  className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 border transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                     currentAnswer.isDoubtful
                       ? "bg-amber-400 text-zinc-950 border-amber-500"
                       : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100"
@@ -721,6 +976,10 @@ export default function ExamPlayPage({
                 akhir beserta bonus kecepatan langsung dihitung.
               </p>
             </div>
+
+            {submitError && (
+              <p className="text-red-600 font-medium text-sm">{submitError}</p>
+            )}
 
             <div className="flex items-center justify-end gap-2.5 pt-3">
               <button
