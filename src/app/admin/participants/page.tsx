@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Search, X, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, X, Users, KeyRound } from "lucide-react";
 
 interface ParticipantUser {
   id: string;
@@ -59,6 +59,9 @@ export default function AdminParticipantsPage() {
   const [sendingBatch, setSendingBatch] = useState(false);
   const [batchResult, setBatchResult] = useState("");
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [resettingId, setResettingId] = useState<string | null>(null);
+  const [resetResult, setResetResult] = useState<{ username: string; password: string } | null>(null);
+  const [resetCopied, setResetCopied] = useState(false);
 
   async function loadData() {
     setLoading(true);
@@ -249,6 +252,30 @@ export default function AdminParticipantsPage() {
       await loadData();
     } finally {
       setResendingId(null);
+    }
+  }
+
+  async function handleResetPassword(id: string, username: string) {
+    if (
+      !confirm(
+        `Reset sandi ${username}? Sandi lama tidak berlaku lagi. Sandi baru hanya tampil sekali di sini dan TIDAK dikirim lewat email.`
+      )
+    )
+      return;
+    setResettingId(id);
+    try {
+      const res = await fetch(`/api/admin/users/${id}/reset-password`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Gagal mereset sandi");
+        return;
+      }
+      setResetCopied(false);
+      setResetResult({ username: data.username, password: data.password });
+    } finally {
+      setResettingId(null);
     }
   }
 
@@ -553,6 +580,19 @@ export default function AdminParticipantsPage() {
                             : "Kirim Ulang"}
                         </button>
                         <button
+                          onClick={() => handleResetPassword(p.id, p.username)}
+                          disabled={resettingId === p.id || !p.isActive}
+                          title={
+                            !p.isActive
+                              ? "Akun nonaktif"
+                              : "Reset sandi (tampil sekali, tanpa email)"
+                          }
+                          className="px-3 py-1.5 rounded-lg border border-sky-700/30 hover:bg-sky-50 text-sky-800 text-xs font-semibold flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                        >
+                          <KeyRound className="w-3.5 h-3.5" />
+                          {resettingId === p.id ? "Mereset..." : "Reset Sandi"}
+                        </button>
+                        <button
                           onClick={() => openEditModal(p)}
                           className="px-3 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
                         >
@@ -608,6 +648,14 @@ export default function AdminParticipantsPage() {
                       className="flex-1 px-3 py-2 rounded-lg border border-yellow-700/30 text-yellow-800 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
                     >
                       {resendingId === p.id ? "Mengirim..." : "Kirim Ulang"}
+                    </button>
+                    <button
+                      onClick={() => handleResetPassword(p.id, p.username)}
+                      disabled={resettingId === p.id || !p.isActive}
+                      className="flex-1 px-3 py-2 rounded-lg border border-sky-700/30 text-sky-800 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                    >
+                      <KeyRound className="w-3.5 h-3.5" />
+                      {resettingId === p.id ? "Mereset..." : "Reset Sandi"}
                     </button>
                     <button
                       onClick={() => openEditModal(p)}
@@ -762,6 +810,57 @@ export default function AdminParticipantsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Sandi Baru (sekali tampil) */}
+      {resetResult && (
+        <div className="fixed inset-0 z-50 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl border border-zinc-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+              <h2 className="text-lg font-bold text-zinc-900">
+                Sandi Baru untuk {resetResult.username}
+              </h2>
+              <button
+                onClick={() => setResetResult(null)}
+                className="text-zinc-400 hover:text-zinc-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-zinc-500">
+              Sandi ini hanya tampil sekali. Setelah ditutup, sandi ini tidak
+              bisa dilihat lagi — kalau belum dicatat, reset lagi untuk sandi
+              baru. Sandi ini tidak dikirim lewat email; teruskan sendiri ke
+              peserta.
+            </p>
+            <div className="font-mono text-2xl font-bold text-zinc-900 bg-zinc-100 rounded-xl px-4 py-3 text-center tracking-wider">
+              {resetResult.password}
+            </div>
+            <div className="flex justify-end gap-2 pt-3 border-t border-zinc-200">
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(resetResult.password);
+                    setResetCopied(true);
+                  } catch {
+                    alert("Gagal menyalin, salin manual dari layar.");
+                  }
+                }}
+                className="px-4 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold cursor-pointer"
+              >
+                {resetCopied ? "Tersalin!" : "Salin Sandi"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setResetResult(null)}
+                className="px-5 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}

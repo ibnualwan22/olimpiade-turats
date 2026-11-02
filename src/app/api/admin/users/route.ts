@@ -78,18 +78,6 @@ export async function POST(req: Request) {
       );
     }
 
-    if (cleanEmail) {
-      const emailTaken = await prisma.user.findFirst({
-        where: { email: { equals: cleanEmail, mode: "insensitive" } },
-      });
-      if (emailTaken) {
-        return NextResponse.json(
-          { error: "Email sudah dipakai akun lain" },
-          { status: 400 }
-        );
-      }
-    }
-
     const cleanUsername = username.trim();
     const exists = await prisma.user.findUnique({
       where: { username: cleanUsername },

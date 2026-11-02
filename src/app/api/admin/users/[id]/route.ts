@@ -37,20 +37,6 @@ export async function PUT(
           { status: 400 }
         );
       }
-      if (cleanEmail) {
-        const emailTaken = await prisma.user.findFirst({
-          where: {
-            email: { equals: cleanEmail, mode: "insensitive" },
-            id: { not: id },
-          },
-        });
-        if (emailTaken) {
-          return NextResponse.json(
-            { error: "Email sudah dipakai akun lain" },
-            { status: 400 }
-          );
-        }
-      }
     }
 
     const updateData: Record<string, unknown> = {
