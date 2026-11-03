@@ -63,7 +63,7 @@ export default function AdminQuestionsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState("");
-  const [weight, setWeight] = useState(10);
+  const [weight, setWeight] = useState(2);
   const [content, setContent] = useState("");
   const [explanation, setExplanation] = useState("");
   const [options, setOptions] = useState<OptionForm[]>([
@@ -104,10 +104,15 @@ export default function AdminQuestionsPage() {
     loadData();
   }, []);
 
+  // Default soal manual baru: kategori "Olimpiade" (bila ada) dan bobot 2
+  // — mempercepat input soal lomba (50 soal x bobot 2 = 100).
   function openCreateModal() {
     setEditingId(null);
-    setCategoryId(categories[0]?.id || "");
-    setWeight(10);
+    const defaultCat =
+      categories.find((c) => c.name.toLowerCase() === "olimpiade") ||
+      categories[0];
+    setCategoryId(defaultCat?.id || "");
+    setWeight(2);
     setContent("");
     setExplanation("");
     setOptions([
