@@ -61,7 +61,17 @@ export default function AdminParticipantsPage() {
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [resettingId, setResettingId] = useState<string | null>(null);
   const [resetResult, setResetResult] = useState<{ username: string; password: string } | null>(null);
-  const [resetCopied, setResetCopied] = useState(false);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const LOGIN_URL = "https://olimpiade-turats.markazarabiyah.site";
+
+  async function copyResetField(key: string, text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+    } catch {
+      alert("Gagal menyalin, salin manual dari layar.");
+    }
+  }
 
   async function loadData() {
     setLoading(true);
@@ -272,7 +282,7 @@ export default function AdminParticipantsPage() {
         alert(data.error || "Gagal mereset sandi");
         return;
       }
-      setResetCopied(false);
+      setCopiedKey(null);
       setResetResult({ username: data.username, password: data.password });
     } finally {
       setResettingId(null);
@@ -835,28 +845,75 @@ export default function AdminParticipantsPage() {
               baru. Sandi ini tidak dikirim lewat email; teruskan sendiri ke
               peserta.
             </p>
-            <div className="font-mono text-2xl font-bold text-zinc-900 bg-zinc-100 rounded-xl px-4 py-3 text-center tracking-wider">
-              {resetResult.password}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-20 shrink-0 text-xs font-semibold text-zinc-500">
+                  Link login
+                </span>
+                <a
+                  href={LOGIN_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 truncate text-sm font-medium text-blue-700 underline"
+                >
+                  {LOGIN_URL}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => copyResetField("link", LOGIN_URL)}
+                  className="shrink-0 px-3 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold cursor-pointer"
+                >
+                  {copiedKey === "link" ? "Tersalin!" : "Salin Link"}
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-20 shrink-0 text-xs font-semibold text-zinc-500">
+                  Username
+                </span>
+                <span className="flex-1 truncate font-mono text-sm font-bold text-zinc-900">
+                  {resetResult.username}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => copyResetField("username", resetResult.username)}
+                  className="shrink-0 px-3 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold cursor-pointer"
+                >
+                  {copiedKey === "username" ? "Tersalin!" : "Salin Username"}
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-20 shrink-0 text-xs font-semibold text-zinc-500">
+                  Sandi baru
+                </span>
+                <span className="flex-1 font-mono text-xl font-bold text-zinc-900 bg-zinc-100 rounded-xl px-4 py-3 text-center tracking-wider">
+                  {resetResult.password}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => copyResetField("password", resetResult.password)}
+                  className="shrink-0 px-3 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold cursor-pointer"
+                >
+                  {copiedKey === "password" ? "Tersalin!" : "Salin Sandi"}
+                </button>
+              </div>
             </div>
             <div className="flex justify-end gap-2 pt-3 border-t border-zinc-200">
               <button
                 type="button"
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(resetResult.password);
-                    setResetCopied(true);
-                  } catch {
-                    alert("Gagal menyalin, salin manual dari layar.");
-                  }
-                }}
-                className="px-4 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold cursor-pointer"
+                onClick={() =>
+                  copyResetField(
+                    "all",
+                    `Link: ${LOGIN_URL}\nUsername: ${resetResult.username}\nPassword: ${resetResult.password}`
+                  )
+                }
+                className="px-4 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold cursor-pointer"
               >
-                {resetCopied ? "Tersalin!" : "Salin Sandi"}
+                {copiedKey === "all" ? "Tersalin!" : "Salin Semua"}
               </button>
               <button
                 type="button"
                 onClick={() => setResetResult(null)}
-                className="px-5 py-2 rounded-xl bg-zinc-900 text-white text-xs font-bold cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-semibold cursor-pointer"
               >
                 Tutup
               </button>

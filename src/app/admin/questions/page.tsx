@@ -11,11 +11,11 @@ import {
   X,
 } from "lucide-react";
 import { renderRichText } from "@/lib/safeHtml";
+import { getTextDirection } from "@/lib/text-direction";
 
 interface OptionForm {
   label: string;
   content: string;
-  direction: "RTL" | "LTR";
   isCorrect: boolean;
 }
 
@@ -63,15 +63,14 @@ export default function AdminQuestionsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState("");
-  const [direction, setDirection] = useState<"RTL" | "LTR">("RTL");
   const [weight, setWeight] = useState(10);
   const [content, setContent] = useState("");
   const [explanation, setExplanation] = useState("");
   const [options, setOptions] = useState<OptionForm[]>([
-    { label: "A", content: "", direction: "RTL", isCorrect: true },
-    { label: "B", content: "", direction: "RTL", isCorrect: false },
-    { label: "C", content: "", direction: "RTL", isCorrect: false },
-    { label: "D", content: "", direction: "RTL", isCorrect: false },
+    { label: "A", content: "", isCorrect: true },
+    { label: "B", content: "", isCorrect: false },
+    { label: "C", content: "", isCorrect: false },
+    { label: "D", content: "", isCorrect: false },
   ]);
   const [saving, setSaving] = useState(false);
 
@@ -108,15 +107,14 @@ export default function AdminQuestionsPage() {
   function openCreateModal() {
     setEditingId(null);
     setCategoryId(categories[0]?.id || "");
-    setDirection("RTL");
     setWeight(10);
     setContent("");
     setExplanation("");
     setOptions([
-      { label: "A", content: "", direction: "RTL", isCorrect: true },
-      { label: "B", content: "", direction: "RTL", isCorrect: false },
-      { label: "C", content: "", direction: "RTL", isCorrect: false },
-      { label: "D", content: "", direction: "RTL", isCorrect: false },
+      { label: "A", content: "", isCorrect: true },
+      { label: "B", content: "", isCorrect: false },
+      { label: "C", content: "", isCorrect: false },
+      { label: "D", content: "", isCorrect: false },
     ]);
     setShowModal(true);
   }
@@ -124,7 +122,6 @@ export default function AdminQuestionsPage() {
   function openEditModal(q: QuestionRecord) {
     setEditingId(q.id);
     setCategoryId(q.categoryId || "");
-    setDirection(q.direction);
     setWeight(q.weight);
     setContent(q.content);
     setExplanation(q.explanation || "");
@@ -132,7 +129,6 @@ export default function AdminQuestionsPage() {
       q.options.map((o) => ({
         label: o.label,
         content: o.content,
-        direction: o.direction,
         isCorrect: o.isCorrect,
       }))
     );
@@ -154,14 +150,18 @@ export default function AdminQuestionsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           categoryId: categoryId || null,
-          direction,
+          // Arah tulisan dideteksi otomatis dari isi (helper yang sama dengan
+          // halaman ujian): soal Indonesia -> LTR, soal Arab -> RTL, dan tiap
+          // opsi ikut bahasanya sendiri — bukan lagi satu arah untuk semua.
+          direction: getTextDirection(content),
           weight: Number(weight),
           content,
           explanation,
           options: options.map((o, idx) => ({
-            ...o,
             label: String.fromCharCode(65 + idx),
-            direction,
+            content: o.content,
+            isCorrect: o.isCorrect,
+            direction: getTextDirection(o.content),
           })),
         }),
       });
@@ -272,8 +272,10 @@ export default function AdminQuestionsPage() {
             Manajemen Bank Soal &amp; Bobot
           </h1>
           <p className="text-sm text-zinc-500 mt-0.5">
-            Kelola soal pilihan ganda berbahasa Arab (RTL) maupun Indonesia
-            (LTR) beserta opsi dan bobot nilainya.
+            Kelola soal pilihan ganda berbahasa Arab maupun Indonesia beserta
+            opsi dan bobot nilainya. Arah tulisan (RTL/LTR) menyesuaikan isi
+            teks secara otomatis — sama seperti yang dilihat peserta di halaman
+            ujian.
           </p>
         </div>
 
@@ -386,7 +388,7 @@ export default function AdminQuestionsPage() {
                   {previewRows.map((r, i) => (
                     <tr key={i}>
                       <td className="p-2.5">{r.index}</td>
-                      <td className="p-2.5 max-w-100">
+                      <td className="p-2.5 max-w-100" dir={getTextDirection(r.contentHtml) === "RTL" ? "rtl" : "ltr"}>
                         {renderRichText(r.contentHtml)}
                       </td>
                       <td className="p-2.5">
@@ -457,7 +459,7 @@ export default function AdminQuestionsPage() {
                     Bobot: {q.weight} Poin
                   </span>
                   <span className="px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 text-xs font-mono">
-                    {q.direction}
+                    {getTextDirection(q.content)}
                   </span>
                 </div>
 
@@ -478,8 +480,8 @@ export default function AdminQuestionsPage() {
               </div>
 
               <div
-                dir={q.direction === "RTL" ? "rtl" : "ltr"}
-                className={`p-4 rounded-xl bg-yellow-50/40 border border-yellow-200/60 text-zinc-900 whitespace-pre-line ${q.direction === "RTL"
+                dir={getTextDirection(q.content) === "RTL" ? "rtl" : "ltr"}
+                className={`p-4 rounded-xl bg-yellow-50/40 border border-yellow-200/60 text-zinc-900 whitespace-pre-line ${getTextDirection(q.content) === "RTL"
                   ? "font-arabic text-2xl text-right"
                   : "text-sm sm:text-base"
                   }`}
@@ -505,8 +507,8 @@ export default function AdminQuestionsPage() {
                       {opt.label}
                     </span>
                     <span
-                      dir={opt.direction === "RTL" ? "rtl" : "ltr"}
-                      className={`flex-1 ${opt.direction === "RTL"
+                      dir={getTextDirection(opt.content) === "RTL" ? "rtl" : "ltr"}
+                      className={`flex-1 ${getTextDirection(opt.content) === "RTL"
                         ? "font-arabic text-xl text-right"
                         : "text-xs sm:text-sm"
                         }`}
@@ -541,7 +543,7 @@ export default function AdminQuestionsPage() {
             </div>
 
             <form onSubmit={handleSaveQuestion} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-zinc-700 mb-1">
                     Kategori Materi
@@ -557,22 +559,6 @@ export default function AdminQuestionsPage() {
                         {c.name}
                       </option>
                     ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 mb-1">
-                    Arah Teks &amp; Bahasa
-                  </label>
-                  <select
-                    value={direction}
-                    onChange={(e) =>
-                      setDirection(e.target.value as "RTL" | "LTR")
-                    }
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-300 text-sm bg-white"
-                  >
-                    <option value="RTL">RTL — Bahasa Arab (Kitab)</option>
-                    <option value="LTR">LTR — Bahasa Indonesia / Latin</option>
                   </select>
                 </div>
 
@@ -598,15 +584,15 @@ export default function AdminQuestionsPage() {
                 <textarea
                   rows={4}
                   required
-                  dir={direction === "RTL" ? "rtl" : "ltr"}
+                  dir={getTextDirection(content) === "RTL" ? "rtl" : "ltr"}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder={
-                    direction === "RTL"
+                    getTextDirection(content) === "RTL"
                       ? "اكتب نص السؤال هنا..."
                       : "Ketik pertanyaan soal di sini..."
                   }
-                  className={`w-full p-3.5 rounded-xl border border-zinc-300 outline-none focus:border-yellow-500 ${direction === "RTL"
+                  className={`w-full p-3.5 rounded-xl border border-zinc-300 outline-none focus:border-yellow-500 ${getTextDirection(content) === "RTL"
                     ? "font-arabic text-2xl text-right"
                     : "text-sm"
                     }`}
@@ -629,7 +615,6 @@ export default function AdminQuestionsPage() {
                           {
                             label: String.fromCharCode(65 + prev.length),
                             content: "",
-                            direction,
                             isCorrect: false,
                           },
                         ])
@@ -671,7 +656,7 @@ export default function AdminQuestionsPage() {
                     <input
                       type="text"
                       required
-                      dir={direction === "RTL" ? "rtl" : "ltr"}
+                      dir={getTextDirection(opt.content) === "RTL" ? "rtl" : "ltr"}
                       value={opt.content}
                       onChange={(e) =>
                         setOptions((prev) =>
@@ -681,7 +666,7 @@ export default function AdminQuestionsPage() {
                         )
                       }
                       placeholder={`Teks opsi ${String.fromCharCode(65 + idx)}`}
-                      className={`flex-1 px-3 py-2 rounded-lg border border-zinc-300 bg-white outline-none ${direction === "RTL"
+                      className={`flex-1 px-3 py-2 rounded-lg border border-zinc-300 bg-white outline-none ${getTextDirection(opt.content) === "RTL"
                         ? "font-arabic text-xl text-right"
                         : "text-sm"
                         }`}

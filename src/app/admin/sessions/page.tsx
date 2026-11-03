@@ -13,6 +13,7 @@ import {
   X,
   Power,
 } from "lucide-react";
+import { getTextDirection } from "@/lib/text-direction";
 
 interface SessionItem {
   id: string;
@@ -655,9 +656,9 @@ export default function AdminSessionsPage() {
                             <span>Bobot {q.weight} Poin</span>
                           </div>
                           <div
-                            dir={q.direction === "RTL" ? "rtl" : "ltr"}
+                            dir={getTextDirection(q.content) === "RTL" ? "rtl" : "ltr"}
                             className={`truncate text-zinc-800 ${
-                              q.direction === "RTL"
+                              getTextDirection(q.content) === "RTL"
                                 ? "font-arabic text-lg"
                                 : "text-xs"
                             }`}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, use, useRef } from "react";
 import { renderRichText } from "@/lib/safeHtml";
+import { getTextDirection } from "@/lib/text-direction";
 import { useRouter } from "next/navigation";
 import {
   Clock,
@@ -582,6 +583,11 @@ export default function ExamPlayPage({
   }
 
   const currentQuestion = questions[currentIdx];
+  // Arah tulisan dideteksi otomatis dari isi soal (helper yang sama dengan
+  // halaman manajemen soal), bukan dari field direction tersimpan.
+  const questionDirection = currentQuestion
+    ? getTextDirection(currentQuestion.content)
+    : "LTR";
   const currentAnswer = currentQuestion
     ? answers[currentQuestion.id] || {
         selectedOptionId: null,
@@ -748,9 +754,9 @@ export default function ExamPlayPage({
                 {/* Question Content */}
                 <div className="p-6 sm:p-8">
                   <div
-                    dir={currentQuestion.direction === "RTL" ? "rtl" : "ltr"}
+                    dir={questionDirection === "RTL" ? "rtl" : "ltr"}
                     className={`p-6 rounded-xl bg-amber-50/40 border border-amber-200/60 text-zinc-900 whitespace-pre-line ${
-                      currentQuestion.direction === "RTL"
+                      questionDirection === "RTL"
                         ? `font-arabic ${arabicSizeClass} text-right`
                         : "text-base sm:text-lg leading-relaxed"
                     }`}
@@ -792,9 +798,9 @@ export default function ExamPlayPage({
                           </div>
 
                           <div
-                            dir={opt.direction === "RTL" ? "rtl" : "ltr"}
+                            dir={getTextDirection(opt.content) === "RTL" ? "rtl" : "ltr"}
                             className={`flex-1 ${
-                              opt.direction === "RTL"
+                              getTextDirection(opt.content) === "RTL"
                                 ? `font-arabic ${optionArabicSizeClass} text-right`
                                 : "text-sm sm:text-base text-zinc-800"
                             }`}
