@@ -254,6 +254,58 @@ export default function AdminMonitoringPage() {
     return `${m}m ${s}d`;
   }
 
+  // Durasi pengerjaan sampai milidetik, dari stempel server (startedAt ->
+  // finishedAt). Hanya untuk attempt yang sudah selesai; selama masih
+  // mengerjakan kembalikan null supaya pemanggil memakai formatTimeSpent.
+  // Ini TAMPILAN saja: tidak mengubah penilaian (speedBonus tetap 0) dan
+  // tidak mengubah urutan peringkat (masih per detik + finishedAt).
+  // Untuk TIME_UP, finishedAt = expiresAt sehingga durasinya tepat sama
+  // dengan batas waktu yang diizinkan.
+  function formatDurasiMs(startedAt: string | null, finishedAt: string | null) {
+    if (!startedAt || !finishedAt) return null;
+    const ms = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
+    if (ms < 0) return null;
+    const m = Math.floor(ms / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    const r = ms % 1000;
+    return `${m}m ${s}.${String(r).padStart(3, "0")}d`;
+  }
+
+  // "5.0d" / "1m 5.3d": jeda satu simpanan jawaban ke simpanan berikutnya.
+  function formatJeda(ms: number | null) {
+    if (ms === null || ms < 0) return "-";
+    const totalDetik = ms / 1000;
+    if (totalDetik < 60) return `${totalDetik.toFixed(1)}d`;
+    const m = Math.floor(totalDetik / 60);
+    const s = totalDetik - m * 60;
+    return `${m}m ${s.toFixed(1)}d`;
+  }
+
+  // Jeda per nomor, dihitung dari simpanan SEBELUMNYA SECARA KRONOLOGIS
+  // (bukan dari nomor sebelumnya — peserta bisa menjawab acak urutan dan
+  // revisi menggeser answeredAt, jadi urutan nomor bisa tidak kronologis).
+  // Nomor pertama dihitung dari waktu Mulai (startedAt). answeredAt =
+  // terakhir kali nomor itu disimpan/diubah, bukan pertama kali, jadi jeda
+  // ini sinyal pola (mis. bot), bukan bukti.
+  const jedaMap = new Map<string, number | null>();
+  if (detailData) {
+    const kronologis = [...detailData.answers]
+      .filter((a) => a.answeredAt)
+      .sort(
+        (a, b) =>
+          new Date(a.answeredAt).getTime() - new Date(b.answeredAt).getTime()
+      );
+    const mulaiMs = detailData.attempt.startedAt
+      ? new Date(detailData.attempt.startedAt).getTime()
+      : null;
+    kronologis.forEach((a, i) => {
+      const t = new Date(a.answeredAt).getTime();
+      const prev =
+        i === 0 ? mulaiMs : new Date(kronologis[i - 1].answeredAt).getTime();
+      jedaMap.set(a.questionId, prev === null ? null : t - prev);
+    });
+  }
+
   function formatRemaining(expiresAt: string | null): string {
     if (!expiresAt || !serverNowMs) return "-";
     const sec = Math.floor(
@@ -667,7 +719,8 @@ export default function AdminMonitoringPage() {
                               ) : (
                                 <span className="font-semibold text-zinc-900">
                                   Selesai dalam{" "}
-                                  {formatTimeSpent(a.timeSpentSeconds)}
+                                  {formatDurasiMs(a.startedAt, a.finishedAt) ??
+                                    formatTimeSpent(a.timeSpentSeconds)}
                                 </span>
                               )}
                             </td>
@@ -911,7 +964,8 @@ export default function AdminMonitoringPage() {
                           </span>
                         </td>
                         <td className="p-4 font-mono text-xs text-zinc-700">
-                          {formatTimeSpent(r.timeSpentSeconds)}
+                          {formatDurasiMs(r.startedAt, r.finishedAt) ??
+                            formatTimeSpent(r.timeSpentSeconds)}
                         </td>
                         <td className="p-4 text-right">
                           <span className="text-lg font-black text-zinc-800">
@@ -954,7 +1008,8 @@ export default function AdminMonitoringPage() {
                           </span>
                         )}{" "}
                         • Speed +{r.speedBonus} •{" "}
-                        {formatTimeSpent(r.timeSpentSeconds)}
+                        {formatDurasiMs(r.startedAt, r.finishedAt) ??
+                          formatTimeSpent(r.timeSpentSeconds)}
                       </div>
                     </div>
                     <div className="text-lg font-black text-zinc-900 shrink-0">
@@ -1166,7 +1221,10 @@ export default function AdminMonitoringPage() {
                     <div>
                       Durasi:{" "}
                       {detailData.attempt.status !== "IN_PROGRESS"
-                        ? formatTimeSpent(
+                        ? formatDurasiMs(
+                          detailData.attempt.startedAt,
+                          detailData.attempt.finishedAt
+                        ) ?? formatTimeSpent(
                           detailData.attempt.timeSpentSeconds
                         )
                         : "Masih mengerjakan"}
@@ -1182,6 +1240,7 @@ export default function AdminMonitoringPage() {
                           <th className="p-3">Jawaban Peserta</th>
                           <th className="p-3">Kunci</th>
                           <th className="p-3">Hasil</th>
+                          <th className="p-3">Jeda</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-100">
@@ -1251,6 +1310,9 @@ export default function AdminMonitoringPage() {
                                     ✗ Salah
                                   </span>
                                 )}
+                              </td>
+                              <td className="p-3 font-mono text-xs text-zinc-700 whitespace-nowrap">
+                                {formatJeda(jedaMap.get(ans.questionId) ?? null)}
                               </td>
                             </tr>
                           );
