@@ -64,6 +64,9 @@ export async function PUT(
         // Hanya ubah jendela bila klien benar-benar mengirim kuncinya,
         // supaya klien lama yang tidak mengenal kolom ini tidak ikut
         // menghapus jendela yang sudah tersimpan.
+        ...("resultsVisible" in body
+          ? { resultsVisible: Boolean(body.resultsVisible) }
+          : {}),
         ...("startTime" in body
           ? { startTime: parseOptionalDate(startTime) }
           : {}),
@@ -107,18 +110,21 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await req.json();
-  const { isActive } = body;
+  const { isActive, resultsVisible } = body;
 
-  if (typeof isActive !== "boolean") {
+  if (typeof isActive !== "boolean" && typeof resultsVisible !== "boolean") {
     return NextResponse.json(
-      { error: "isActive harus boolean" },
+      { error: "isActive atau resultsVisible harus boolean" },
       { status: 400 }
     );
   }
 
   const updated = await prisma.examSession.update({
     where: { id },
-    data: { isActive },
+    data: {
+      ...(typeof isActive === "boolean" ? { isActive } : {}),
+      ...(typeof resultsVisible === "boolean" ? { resultsVisible } : {}),
+    },
   });
 
   return NextResponse.json({ session: updated });

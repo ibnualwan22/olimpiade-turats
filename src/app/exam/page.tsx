@@ -26,10 +26,10 @@ interface AttemptItem {
   startedAt: string | null;
   expiresAt: string | null;
   timeSpentSeconds: number | null;
-  rawScore: number;
-  penaltyScore: number;
-  speedBonus: number;
-  finalScore: number;
+  rawScore: number | null;
+  penaltyScore: number | null;
+  speedBonus: number | null;
+  finalScore: number | null;
   session: {
     id: string;
     title: string;
@@ -37,6 +37,7 @@ interface AttemptItem {
     durationMinutes: number;
     speedScoringMode: "BONUS_POINTS" | "TIE_BREAKER";
     maxSpeedBonus: number;
+    resultsVisible: boolean;
     _count: { questions: number };
   };
 }
@@ -397,22 +398,29 @@ export default function ParticipantDashboardPage() {
                       {att.session.title}
                     </h3>
 
-                    {att.status !== "IN_PROGRESS" && (
-                      <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-zinc-600">
-                        <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
-                          <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                          Skor Akhir: {att.finalScore}
-                        </span>
-                        <span>Skor Jawaban: {att.rawScore}</span>
-                        <span className="inline-flex items-center gap-1 text-amber-700">
-                          <Zap className="w-3.5 h-3.5" />
-                          Bonus Kecepatan: +{att.speedBonus}
-                        </span>
-                        <span>
-                          Waktu Selesai: {formatDuration(att.timeSpentSeconds)}
-                        </span>
-                      </div>
-                    )}
+                    {att.status !== "IN_PROGRESS" &&
+                      (att.session.resultsVisible ? (
+                        <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-zinc-600">
+                          <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
+                            <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                            Skor Akhir: {att.finalScore}
+                          </span>
+                          <span>Skor Jawaban: {att.rawScore}</span>
+                          <span className="inline-flex items-center gap-1 text-amber-700">
+                            <Zap className="w-3.5 h-3.5" />
+                            Bonus Kecepatan: +{att.speedBonus}
+                          </span>
+                          <span>
+                            Waktu Selesai: {formatDuration(att.timeSpentSeconds)}
+                          </span>
+                        </div>
+                      ) : (
+                        <p className="pt-1 text-xs text-zinc-500">
+                          Transkrip nilai dan peringkat akan ditampilkan
+                          setelah pengumuman resmi pada tanggal 5 November
+                          2026.
+                        </p>
+                      ))}
                   </div>
 
                   <div>

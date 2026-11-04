@@ -101,6 +101,10 @@ model ExamSession {
   accessToken      String            @unique
   durationMinutes  Int               @default(60)
   isActive         Boolean           @default(false)
+  // EMBARGO HASIL (5 Nov 2026): false = nilai & peringkat attempt selesai
+  // ditahan dari peserta (API + tampilan); true = ditampilkan. Admin
+  // membukanya lewat toggle di halaman sesi saat pengumuman resmi.
+  resultsVisible   Boolean           @default(false)
   startTime        DateTime?
   endTime          DateTime?
   shuffleQuestions Boolean           @default(true)

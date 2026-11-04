@@ -58,6 +58,7 @@ export async function GET(req: Request) {
             title: true,
             description: true,
             durationMinutes: true,
+            resultsVisible: true,
             speedScoringMode: true,
             maxSpeedBonus: true,
             _count: { select: { questions: true } },
@@ -74,9 +75,27 @@ export async function GET(req: Request) {
       select: { email: true },
     });
 
+    // EMBARGO HASIL: selama sesi belum membuka hasil (resultsVisible
+    // false), skor attempt yang sudah selesai ditahan dari peserta.
+    // Status + info sesi tetap dikirim supaya dashboard bisa menampilkan
+    // pesan pengumuman, bukan angka.
+    const visibleAttempts = attempts.map((att) => {
+      const embargoed =
+        att.status !== "IN_PROGRESS" && !att.session.resultsVisible;
+      if (!embargoed) return att;
+      return {
+        ...att,
+        timeSpentSeconds: null,
+        rawScore: null,
+        penaltyScore: null,
+        speedBonus: null,
+        finalScore: null,
+      };
+    });
+
     return NextResponse.json({
       user: { ...userSession, email: dbUser?.email ?? null },
-      attempts,
+      attempts: visibleAttempts,
       serverTime: new Date().toISOString(),
     });
   }
@@ -194,6 +213,11 @@ export async function GET(req: Request) {
         )
       : questions;
 
+  // EMBARGO HASIL (cabang yang sama seperti daftar dashboard): tahan
+  // skor attempt selesai selama sesi belum membuka hasil.
+  const embargoed =
+    attempt.status !== "IN_PROGRESS" && !attempt.session.resultsVisible;
+
   return NextResponse.json({
     serverTime: now.toISOString(),
     attempt: {
@@ -204,11 +228,11 @@ export async function GET(req: Request) {
       expiresAt: attempt.expiresAt,
       extraMinutes: attempt.extraMinutes,
       finishedAt: attempt.finishedAt,
-      timeSpentSeconds: attempt.timeSpentSeconds,
-      rawScore: attempt.rawScore,
-      penaltyScore: attempt.penaltyScore,
-      speedBonus: attempt.speedBonus,
-      finalScore: attempt.finalScore,
+      timeSpentSeconds: embargoed ? null : attempt.timeSpentSeconds,
+      rawScore: embargoed ? null : attempt.rawScore,
+      penaltyScore: embargoed ? null : attempt.penaltyScore,
+      speedBonus: embargoed ? null : attempt.speedBonus,
+      finalScore: embargoed ? null : attempt.finalScore,
     },
     session: {
       id: attempt.session.id,
@@ -219,6 +243,7 @@ export async function GET(req: Request) {
       wrongPenalty: attempt.session.wrongPenalty,
       speedScoringMode: attempt.session.speedScoringMode,
       maxSpeedBonus: attempt.session.maxSpeedBonus,
+      resultsVisible: attempt.session.resultsVisible,
       totalQuestions: questions.length,
     },
     questions: visibleQuestions,

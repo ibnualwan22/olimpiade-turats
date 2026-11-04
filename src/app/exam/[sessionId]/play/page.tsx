@@ -139,10 +139,10 @@ export default function ExamPlayPage({
     startedAt: string | null;
     expiresAt: string | null;
     timeSpentSeconds: number | null;
-    rawScore: number;
-    penaltyScore: number;
-    speedBonus: number;
-    finalScore: number;
+    rawScore: number | null;
+    penaltyScore: number | null;
+    speedBonus: number | null;
+    finalScore: number | null;
   } | null>(null);
 
   const [sessionInfo, setSessionInfo] = useState<{
@@ -151,6 +151,7 @@ export default function ExamPlayPage({
     durationMinutes: number;
     speedScoringMode: "BONUS_POINTS" | "TIE_BREAKER";
     maxSpeedBonus: number;
+    resultsVisible: boolean;
   } | null>(null);
 
   const [questions, setQuestions] = useState<QuestionItem[]>([]);
@@ -520,54 +521,71 @@ export default function ExamPlayPage({
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
-              <div className="text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
-                Total Nilai Akhir Anda
-              </div>
-              <div className="text-5xl font-black text-zinc-900">
-                {attempt.finalScore}
-              </div>
-              <div className="text-xs text-amber-700 mt-2">
-                Diselesaikan dalam waktu{" "}
-                <strong>
-                  {mins} menit {secs} detik
-                </strong>
-              </div>
-            </div>
-
-            <div
-              className={`grid gap-3 text-sm ${
-                sessionInfo?.speedScoringMode === "TIE_BREAKER"
-                  ? "grid-cols-1"
-                  : "grid-cols-2"
-              }`}
-            >
-              <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
-                <div className="text-xs text-zinc-500 flex items-center gap-1">
-                  <Trophy className="w-3.5 h-3.5 text-amber-600" /> Skor Bobot
-                  Jawaban
+            {sessionInfo.resultsVisible ? (
+              <>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+                  <div className="text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
+                    Total Nilai Akhir Anda
+                  </div>
+                  <div className="text-5xl font-black text-zinc-900">
+                    {attempt.finalScore}
+                  </div>
+                  <div className="text-xs text-amber-700 mt-2">
+                    Diselesaikan dalam waktu{" "}
+                    <strong>
+                      {mins} menit {secs} detik
+                    </strong>
+                  </div>
                 </div>
-                <div className="text-xl font-bold text-zinc-900 mt-1">
-                  {attempt.rawScore}
-                  {attempt.penaltyScore > 0 && (
-                    <span className="text-xs text-red-600 ml-1">
-                      (-{attempt.penaltyScore})
-                    </span>
+
+                <div
+                  className={`grid gap-3 text-sm ${
+                    sessionInfo?.speedScoringMode === "TIE_BREAKER"
+                      ? "grid-cols-1"
+                      : "grid-cols-2"
+                  }`}
+                >
+                  <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+                    <div className="text-xs text-zinc-500 flex items-center gap-1">
+                      <Trophy className="w-3.5 h-3.5 text-amber-600" /> Skor Bobot
+                      Jawaban
+                    </div>
+                    <div className="text-xl font-bold text-zinc-900 mt-1">
+                      {attempt.rawScore}
+                      {attempt.penaltyScore !== null &&
+                        attempt.penaltyScore > 0 && (
+                          <span className="text-xs text-red-600 ml-1">
+                            (-{attempt.penaltyScore})
+                          </span>
+                        )}
+                    </div>
+                  </div>
+
+                  {sessionInfo?.speedScoringMode !== "TIE_BREAKER" && (
+                    <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
+                      <div className="text-xs text-amber-800 flex items-center gap-1">
+                        <Zap className="w-3.5 h-3.5 text-amber-600" /> Bonus Kecepatan
+                      </div>
+                      <div className="text-xl font-bold text-amber-900 mt-1">
+                        +{attempt.speedBonus}
+                      </div>
+                    </div>
                   )}
                 </div>
+              </>
+            ) : (
+              <div className="space-y-4 text-center">
+                <p className="text-sm text-zinc-700 leading-relaxed">
+                  Terima kasih atas partisipasi Anda dalam Olimpiade Nahwu
+                  Shorof Nasional 2026. Semoga Anda mendapatkan hasil yang
+                  maksimal.
+                </p>
+                <p className="text-sm text-zinc-500 leading-relaxed">
+                  Transkrip nilai dan peringkat akan ditampilkan setelah
+                  pengumuman resmi pada tanggal 5 November 2026.
+                </p>
               </div>
-
-              {sessionInfo?.speedScoringMode !== "TIE_BREAKER" && (
-                <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
-                  <div className="text-xs text-amber-800 flex items-center gap-1">
-                    <Zap className="w-3.5 h-3.5 text-amber-600" /> Bonus Kecepatan
-                  </div>
-                  <div className="text-xl font-bold text-amber-900 mt-1">
-                    +{attempt.speedBonus}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
 
             <button
               onClick={() => router.push("/exam")}

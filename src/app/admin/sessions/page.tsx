@@ -12,6 +12,7 @@ import {
   CheckSquare,
   X,
   Power,
+  Trophy,
 } from "lucide-react";
 import { getTextDirection } from "@/lib/text-direction";
 
@@ -23,6 +24,7 @@ interface SessionItem {
   accessToken: string;
   durationMinutes: number;
   isActive: boolean;
+  resultsVisible: boolean;
   shuffleQuestions: boolean;
   shuffleOptions: boolean;
   startTime: string | null;
@@ -79,6 +81,7 @@ export default function AdminSessionsPage() {
   const [accessToken, setAccessToken] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(45);
   const [isActive, setIsActive] = useState(true);
+  const [resultsVisible, setResultsVisible] = useState(false);
   const [shuffleQuestions, setShuffleQuestions] = useState(true);
   const [shuffleOptions, setShuffleOptions] = useState(false);
   const [startTime, setStartTime] = useState("");
@@ -130,6 +133,7 @@ export default function AdminSessionsPage() {
     generateRandomToken();
     setDurationMinutes(45);
     setIsActive(true);
+    setResultsVisible(false);
     setShuffleQuestions(true);
     setShuffleOptions(false);
     setStartTime("");
@@ -149,6 +153,7 @@ export default function AdminSessionsPage() {
     setAccessToken(s.accessToken);
     setDurationMinutes(s.durationMinutes);
     setIsActive(s.isActive);
+    setResultsVisible(s.resultsVisible);
     setShuffleQuestions(s.shuffleQuestions);
     setShuffleOptions(s.shuffleOptions);
     setStartTime(toLocalInputValue(s.startTime));
@@ -186,6 +191,7 @@ export default function AdminSessionsPage() {
           accessToken,
           durationMinutes: Number(durationMinutes),
           isActive,
+          resultsVisible,
           shuffleQuestions,
           shuffleOptions,
           // Kirim sebagai ISO ber-offset (dari zona waktu browser admin),
@@ -240,6 +246,45 @@ export default function AdminSessionsPage() {
       setSessions((prev) =>
         prev.map((x) =>
           x.id === s.id ? { ...x, isActive: data.session.isActive } : x
+        )
+      );
+    } catch {
+      alert("Gagal menghubungi server");
+    } finally {
+      setTogglingId(null);
+    }
+  }
+
+  // Toggle cepat embargo hasil — satu klik saat pengumuman resmi,
+  // tanpa membuka form edit (PUT penuh berisiko mereset kolom lain).
+  async function handleToggleResults(s: SessionItem) {
+    const next = !s.resultsVisible;
+    if (
+      !confirm(
+        next
+          ? `Tampilkan hasil sesi "${s.title}" ke peserta? Nilai dan peringkat akan terlihat oleh peserta.`
+          : `Sembunyikan lagi hasil sesi "${s.title}" dari peserta?`
+      )
+    )
+      return;
+    setTogglingId(s.id);
+    try {
+      const res = await fetch(`/api/admin/sessions/${s.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resultsVisible: next }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.error || "Gagal mengubah tampilan hasil");
+        return;
+      }
+      const data = await res.json();
+      setSessions((prev) =>
+        prev.map((x) =>
+          x.id === s.id
+            ? { ...x, resultsVisible: data.session.resultsVisible }
+            : x
         )
       );
     } catch {
@@ -305,6 +350,11 @@ export default function AdminSessionsPage() {
                     >
                       {s.isActive ? "Sesi Aktif / Dibuka" : "Ditutup"}
                     </span>
+                    {s.resultsVisible && (
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                        Hasil Ditampilkan
+                      </span>
+                    )}
                     <span className="px-3 py-0.5 rounded-lg bg-yellow-100 border border-yellow-300 text-yellow-950 font-mono font-bold text-xs flex items-center gap-1.5">
                       <KeyRound className="w-3.5 h-3.5" />
                       TOKEN: {s.accessToken}
@@ -336,6 +386,22 @@ export default function AdminSessionsPage() {
                       : s.isActive
                         ? "Tutup Ujian"
                         : "Buka Ujian"}
+                  </button>
+                  <button
+                    onClick={() => handleToggleResults(s)}
+                    disabled={togglingId === s.id}
+                    className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${
+                      s.resultsVisible
+                        ? "border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800"
+                        : "border-zinc-200 hover:bg-zinc-50 text-zinc-700"
+                    }`}
+                  >
+                    <Trophy className="w-3.5 h-3.5" />
+                    {togglingId === s.id
+                      ? "Menyimpan..."
+                      : s.resultsVisible
+                        ? "Sembunyikan Hasil"
+                        : "Tampilkan Hasil"}
                   </button>
                   <button
                     onClick={() => openEditModal(s)}
@@ -592,6 +658,19 @@ export default function AdminSessionsPage() {
                     className="w-4 h-4 accent-zinc-700"
                   />
                   <span>Buka / Aktifkan Sesi Ini</span>
+                </label>
+
+                <label className="flex items-center gap-2 text-xs font-bold text-zinc-800 pt-5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={resultsVisible}
+                    onChange={(e) => setResultsVisible(e.target.checked)}
+                    className="w-4 h-4 accent-zinc-700"
+                  />
+                  <span>
+                    Tampilkan Hasil ke Peserta (nilai &amp; peringkat) —
+                    aktifkan saat pengumuman resmi
+                  </span>
                 </label>
               </div>
 
